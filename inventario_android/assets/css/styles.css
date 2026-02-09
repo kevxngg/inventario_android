@@ -1,0 +1,201 @@
+/* =========================================
+   LAYOUT & SIDEBAR STRUCTURE
+   ========================================= */
+
+   #wrapper {
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR CONFIG --- */
+.sidebar {
+    min-width: 17rem;
+    max-width: 17rem;
+    min-height: 100vh;
+    transition: margin 0.3s ease-out;
+    background-color: white; 
+    border-right: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Efecto vidrio para el sidebar también */
+.glass-sidebar {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+}
+
+.sidebar .sidebar-heading {
+    padding: 1.5rem 1.5rem;
+    font-size: 1.2rem;
+}
+
+.sidebar .list-group {
+    width: 17rem;
+}
+
+/* Items del menú */
+.sidebar .list-group-item {
+    border: none;
+    padding: 15px 30px;
+    font-size: 0.95rem;
+    color: var(--secondary);
+    transition: all 0.2s;
+    margin: 0 10px;
+    border-radius: 50px; /* Botones redondos en el menú */
+}
+
+.sidebar .list-group-item:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(5px);
+}
+
+.sidebar .list-group-item.active {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 97, 164, 0.3);
+}
+
+/* Títulos pequeños en el menú (GESTIÓN, MI OBRA) */
+.sidebar-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #999;
+    padding: 10px 30px;
+    margin-top: 15px;
+    font-weight: 700;
+}
+
+/* Botón de Salir */
+.logout-btn:hover {
+    background-color: #ffebee !important; /* Rojo muy suave */
+    color: #d32f2f !important;
+}
+
+/* --- LOGICA DE TOGGLE (OCULTAR/MOSTRAR MENU) --- */
+#sidebar-wrapper {
+    margin-left: 0;
+}
+
+#page-content-wrapper {
+    min-width: 100vw;
+    transition: margin 0.3s ease-out;
+}
+
+/* Cuando se oculta el menú */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: -17rem;
+}
+
+/* --- RESPONSIVE (CELULARES) --- */
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -17rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* En celular el menú empieza oculto */
+    #sidebar-wrapper {
+        margin-left: -17rem;
+        position: fixed;
+        z-index: 1000;
+        height: 100%;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    }
+    
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+    
+    .navbar-glass {
+        margin: 10px 5px; /* Menos margen en celular */
+    }
+}
+/* Animación de Error (Shake) */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+  
+  .shake-animation {
+      animation: shake 0.4s ease-in-out;
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 4px rgba(186, 26, 26, 0.1) !important;
+  }
+
+  /* CORRECCIÓN PARA EL BOTÓN ACTIVO DEL SIDEBAR */
+.sidebar .list-group-item.active {
+    background-color: var(--primary) !important; /* Fondo Azul */
+    color: white !important; /* Texto Blanco */
+    font-weight: bold;
+    border-radius: 50px;
+    box-shadow: 0 4px 9cap rgba(0, 97, 164, 0.3);
+}
+
+/* Asegurar que el icono también sea blanco */
+.sidebar .list-group-item.active i {
+    color: white !important;
+}
+/* =========================================
+   CORRECCIÓN FINAL: MENÚ DE NOTIFICACIONES
+   ========================================= */
+
+/* 1. Asegurar que la barra de navegación esté en una capa superior */
+.navbar-glass {
+    position: relative;
+    z-index: 1050; 
+}
+
+/* 2. Estilo "Glass" (Vidrio Blur) para el menú desplegable */
+.dropdown-menu {
+    z-index: 9999 !important; /* Siempre al frente */
+    position: absolute !important;
+    
+    /* EFECTO BLUR Y FONDO SEMITRANSPARENTE */
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important; /* Para Safari */
+    background-color: rgba(255, 255, 255, 0.85) !important; /* Blanco al 85% */
+    
+    /* Bordes y sombra suaves */
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important; /* Bordes más redondos */
+    box-shadow: 0 10px 30px rgba(0, 97, 164, 0.15) !important;
+    
+    /* Quitar padding extra de Bootstrap */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: hidden; /* Para que los bordes redondos funcionen bien */
+}
+
+/* 3. Anclar correctamente el menú */
+.dropdown {
+    position: relative !important; /* Importante para que el menú se pegue a este contenedor */
+}
+
+/* 4. Posicionamiento exacto (Sin separación) */
+.dropdown-menu.dropdown-menu-end {
+    /* Pegado a la derecha del botón de la campana */
+    right: 0 !important; 
+    /* Un poco más cerca de la campana verticalmente */
+    top: 55px !important;   
+    /* Ancho fijo para que se vea bien */
+    min-width: 320px !important;
+}
+
+/* Estilo para los ítems de la lista al pasar el mouse */
+.hover-bg:hover {
+    background-color: rgba(0, 97, 164, 0.05) !important; /* Azul muy clarito */
+}
