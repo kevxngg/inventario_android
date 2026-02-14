@@ -1,0 +1,137 @@
+/* =========================================
+   LAYOUT ESTRUCTURAL & RESPONSIVE (MOBILE FIRST)
+   ========================================= */
+
+   #wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    position: relative;
+    overflow-x: hidden; /* Evita scroll horizontal indeseado */
+}
+
+/* --- SIDEBAR (BARRA LATERAL) --- */
+.sidebar {
+    min-width: 280px;
+    max-width: 280px;
+    height: 100vh;
+    position: fixed; /* Fijo para que no scrollee con la página */
+    top: 0;
+    left: 0;
+    z-index: 1050; /* Por encima de todo */
+    overflow-y: auto;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    /* Estilo Liquid Glass para el Sidebar */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border-right: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 5px 0 25px rgba(0, 97, 164, 0.05);
+}
+
+/* Contenido Principal */
+#page-content-wrapper {
+    width: 100%;
+    margin-left: 280px; /* Deja espacio para el sidebar en Desktop */
+    padding-bottom: 50px;
+    transition: margin 0.4s ease;
+    min-height: 100vh;
+}
+
+/* Items del Menú */
+.sidebar .list-group-item {
+    border: none;
+    margin: 4px 15px;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #556;
+    transition: all 0.2s;
+    background: transparent;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar .list-group-item i { width: 25px; text-align: center; }
+
+.sidebar .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: var(--primary);
+    transform: translateX(5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.sidebar .list-group-item.active {
+    background: linear-gradient(90deg, var(--primary), #0076c7);
+    color: white !important;
+    box-shadow: 0 8px 20px rgba(0, 97, 164, 0.3);
+}
+.sidebar .list-group-item.active i { color: white !important; }
+
+/* --- OVERLAY PARA MÓVILES (Fondo oscuro al abrir menú) --- */
+#overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 20, 40, 0.5); /* Azul oscuro semi-transparente */
+    backdrop-filter: blur(4px);
+    z-index: 1040;
+    display: none; /* Oculto por defecto */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* =========================================
+   MEDIA QUERIES (ADAPTACIÓN A MÓVIL)
+   ========================================= */
+
+@media (max-width: 992px) {
+    /* 1. Sidebar oculto por defecto hacia la izquierda */
+    .sidebar {
+        margin-left: -280px; 
+    }
+
+    /* 2. Cuando se activa 'toggled', el sidebar entra (translateX) */
+    #wrapper.toggled .sidebar {
+        margin-left: 0;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+    }
+
+    /* 3. El contenido NO se mueve, ocupa el 100% siempre */
+    #page-content-wrapper {
+        margin-left: 0; 
+        width: 100%;
+    }
+    
+    /* 4. Navbar ajustado */
+    .navbar-glass {
+        margin: 10px;
+        padding: 10px 15px;
+    }
+}
+
+@media (min-width: 993px) {
+    /* En PC, si se activa 'toggled', el sidebar se esconde para dar pantalla completa */
+    #wrapper.toggled .sidebar {
+        margin-left: -280px;
+    }
+    
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* --- ANIMACIONES EXTRA --- */
+.rotate-3d {
+    animation: floatAndRotate 6s ease-in-out infinite;
+}
+
+@keyframes floatAndRotate {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(2deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
