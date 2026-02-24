@@ -1,49 +1,51 @@
 <?php require_once 'views/layouts/header.php'; ?>
 
 <div class="container-fluid p-4">
-    <h2 class="fw-bold text-dark mb-4">Resumen de Actividad</h2>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4 border-bottom border-secondary pb-3">
+        <h2 class="fw-bold text-dark"><i class="fa-solid fa-address-card me-2 text-primary"></i>Panel Operativo del Personal</h2>
+    </div>
 
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100">
+            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100 border-start border-secondary border-4">
                 <div>
-                    <h6 class="text-muted mb-0 small">Mis Solicitudes</h6>
-                    <h2 class="fw-bold mb-0 text-primary"><?= $totalSolicitudes ?></h2>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Solicitudes Emitidas</h6>
+                    <h2 class="fw-bold mb-0 text-dark"><?= $totalSolicitudes ?></h2>
                 </div>
-                <div class="icon-box bg-primary-light text-primary rounded-circle p-3">
-                    <i class="fa-solid fa-clipboard-list fa-lg"></i>
+                <div class="icon-box bg-light text-secondary rounded p-3 border">
+                    <i class="fa-solid fa-file-export fa-lg"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100 border-success">
+            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100 border-start border-success border-4">
                 <div>
-                    <h6 class="text-muted mb-0 small">Aprobadas</h6>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Autorizadas</h6>
                     <h2 class="fw-bold mb-0 text-success"><?= $aprobados ?></h2>
                 </div>
-                <div class="icon-box bg-success-light text-success rounded-circle p-3">
+                <div class="icon-box bg-light text-success rounded p-3 border">
                     <i class="fa-solid fa-check-double fa-lg"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100 border-warning">
+            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100 border-start border-warning border-4">
                 <div>
-                    <h6 class="text-muted mb-0 small">Pendientes</h6>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">En Revisión</h6>
                     <h2 class="fw-bold mb-0 text-warning"><?= $pendientes ?></h2>
                 </div>
-                <div class="icon-box bg-warning-light text-warning rounded-circle p-3">
-                    <i class="fa-solid fa-hourglass-half fa-lg"></i>
+                <div class="icon-box bg-light text-warning rounded p-3 border">
+                    <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100">
+            <div class="glass-card p-3 d-flex align-items-center justify-content-between shadow-sm h-100 border-start border-info border-4">
                 <div>
-                    <h6 class="text-muted mb-0 small">Obras Activas</h6>
-                    <h2 class="fw-bold mb-0 text-dark"><?= $totalObras ?></h2>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Proyectos Vinculados</h6>
+                    <h2 class="fw-bold mb-0 text-info"><?= $totalObras ?></h2>
                 </div>
-                <div class="icon-box bg-light text-dark rounded-circle p-3 border">
+                <div class="icon-box bg-light text-info rounded p-3 border">
                     <i class="fa-solid fa-helmet-safety fa-lg"></i>
                 </div>
             </div>
@@ -51,23 +53,29 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="glass-card p-4 h-100">
-                <h5 class="fw-bold mb-4 text-secondary">Estado de mis Solicitudes</h5>
-                <div style="height: 250px;">
+        <div class="col-md-7 mb-4">
+            <div class="glass-card p-4 h-100 shadow-sm border-0">
+                <h6 class="fw-bold mb-4 text-secondary text-uppercase"><i class="fa-solid fa-chart-pie me-2"></i>Desglose de Peticiones</h6>
+                <div style="height: 260px;">
                     <canvas id="userStatusChart"></canvas>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-6 mb-4">
-            <div class="glass-card p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center">
-                <div class="mb-3">
-                    <i class="fa-solid fa-hard-hat text-primary" style="font-size: 80px; opacity: 0.2;"></i>
+        <div class="col-md-5 mb-4">
+            <div class="glass-card p-4 h-100 shadow-sm border-0 d-flex flex-column justify-content-center">
+                <div class="mb-4 text-center">
+                    <div class="d-inline-block bg-light p-4 rounded-circle border shadow-sm">
+                        <i class="fa-solid fa-industry text-primary fa-3x"></i>
+                    </div>
                 </div>
-                <h4>¡Manos a la obra!</h4>
-                <p class="text-muted">Recuerda reportar cualquier incidente a tiempo.</p>
-                <a href="<?= base_url ?>User/panel" class="btn btn-primary rounded-pill px-4">Ir a Mis Proyectos</a>
+                <h5 class="fw-bold text-dark text-center mb-3">Directrices Operativas</h5>
+                <p class="text-muted text-center small mb-4">Mantenga actualizado el registro de novedades en terreno. Toda solicitud de activos o reporte de incidencias está sujeta a auditoría administrativa.</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="<?= base_url ?>User/catalog" class="btn btn-primary fw-bold shadow-sm"><i class="fa-solid fa-list-check me-2"></i>Ir al Catálogo de Activos</a>
+                    <a href="<?= base_url ?>User/reportView" class="btn btn-outline-danger fw-bold shadow-sm"><i class="fa-solid fa-triangle-exclamation me-2"></i>Registrar Incidencia</a>
+                </div>
             </div>
         </div>
     </div>
@@ -78,20 +86,23 @@
 document.addEventListener("DOMContentLoaded", function() {
     const ctx = document.getElementById('userStatusChart').getContext('2d');
     new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
-            labels: ['Aprobados', 'Pendientes', 'Rechazados'],
+            labels: ['Autorizadas', 'En Revisión (Pendientes)', 'Denegadas'],
             datasets: [{
                 data: [<?= $aprobados ?>, <?= $pendientes ?>, <?= $rechazados ?>],
                 backgroundColor: ['#198754', '#ffc107', '#dc3545'],
-                borderWidth: 0
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 5
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '65%',
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } }
             }
         }
     });

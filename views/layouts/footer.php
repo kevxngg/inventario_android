@@ -6,6 +6,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+    <?php if(isset($_SESSION['alert_message'])): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                Swal.fire({
+                    title: '<?= $_SESSION["alert_icon"] == "success" ? "¡Operación Exitosa!" : "Atención" ?>',
+                    text: '<?= $_SESSION["alert_message"] ?>',
+                    icon: '<?= $_SESSION["alert_icon"] ?>',
+                    confirmButtonColor: '#004b87'
+                });
+            });
+        </script>
+        <?php 
+            // Borramos la alerta para que no vuelva a salir al recargar la página
+            unset($_SESSION['alert_message']); 
+            unset($_SESSION['alert_icon']); 
+        ?>
+    <?php endif; ?>
     <script>
         var el = document.getElementById("wrapper");
         var toggleButton = document.getElementById("menu-toggle");
@@ -30,7 +47,7 @@
 
         // Llamada AJAX
         fetch(BASE_URL + 'Admin/handleRequest?ajax=1&id=' + id + '&status=' + status)
-            .then(response => response.json()) // Esperamos JSON directo
+            .then(response => response.json()) 
             .then(data => {
                 loadNotifications(); // Recargar contador al procesar
                 if(data.status === 'success'){
@@ -63,12 +80,10 @@
                 
                 if (data.length > 0) {
                     // 1. LÓGICA DEL CONTADOR
-                    // Filtramos solo las que son PENDIENTES para el número rojo
                     let pendingCount = data.filter(item => item.status === 'PENDIENTE').length;
 
                     if (pendingCount > 0) {
                         notifBadge.style.display = 'inline-block';
-                        // Si hay más de 9, ponemos 9+
                         notifBadge.innerText = pendingCount > 9 ? '9+' : pendingCount;
                     } else {
                         notifBadge.style.display = 'none';
@@ -110,7 +125,6 @@
                         notifList.innerHTML += html;
                     });
 
-                    // Botón de "Ver todas" si hay muchas
                     if(data.length > 5){
                         notifList.innerHTML += `<li class="p-2 text-center bg-light"><a href="${BASE_URL}Admin/reports" class="text-decoration-none small fw-bold text-primary">Ver todo el historial</a></li>`;
                     }
@@ -132,10 +146,8 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         const bellBtn = document.getElementById('bellBtn');
-        // Cargar al inicio
         loadNotifications();
         
-        // Recargar cada 30 segundos automáticamente (Polling)
         setInterval(loadNotifications, 30000);
 
         if(bellBtn) {

@@ -1,59 +1,130 @@
 <?php require_once 'views/layouts/header.php'; ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-primary-dark">✏️ Editar Usuario</h2>
-    <a href="<?= base_url ?>Admin/users" class="btn btn-outline-secondary rounded-pill">
-        <i class="fa-solid fa-arrow-left me-2"></i> Volver
-    </a>
-</div>
+<style>
+    .admin-edit-avatar {
+        width: 110px !important; 
+        height: 110px !important; 
+        border-radius: 50% !important; 
+        object-fit: cover !important;
+        overflow: hidden !important; 
+        border: 4px solid #ffffff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        background-color: #f8f9fa;
+    }
+</style>
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="glass-card p-5 fade-in-up">
-            
-            <form action="<?= base_url ?>Admin/updateUser?id=<?= $user->id ?>" method="POST">
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary-dark mb-0"><i class="fa-solid fa-user-pen me-2"></i>Gestión de Personal</h2>
+            <p class="text-muted small mt-1">Modificando los credenciales y accesos del sistema.</p>
+        </div>
+        <a href="<?= base_url ?>Admin/users" class="btn btn-light border shadow-sm rounded-pill fw-bold text-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i> Volver al Listado
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+            <div class="glass-card p-4 p-md-5 border-0 shadow-sm fade-in-up">
                 
-                <div class="text-center mb-4">
-                    <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; border-radius: 50%;">
-                        <?= strtoupper(substr($user->fullname, 0, 1)) ?>
+                <form action="<?= base_url ?>Admin/updateUser?id=<?= $user->id ?>" method="POST">
+                    
+                    <div class="text-center mb-5 border-bottom pb-4">
+                        <?php 
+                            // Carga la imagen real del usuario si la tiene
+                            $img = (isset($user->image) && !empty($user->image)) ? $user->image : 'default_user.png';
+                        ?>
+                        <img src="<?= base_url ?>assets/img/<?= htmlspecialchars($img, ENT_QUOTES, 'UTF-8') ?>" 
+                             class="admin-edit-avatar mb-3" 
+                             alt="Avatar de <?= htmlspecialchars($user->fullname, ENT_QUOTES, 'UTF-8') ?>"
+                             onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($user->fullname ?? 'U') ?>&background=0D8ABC&color=fff&rounded=true';">
+                        
+                        <h4 class="fw-bold text-dark mb-1"><?= htmlspecialchars($user->fullname, ENT_QUOTES, 'UTF-8') ?></h4>
+                        <span class="badge <?= $user->role == 'ADMIN' ? 'bg-primary' : 'bg-secondary' ?> rounded-pill shadow-sm">
+                            <i class="fa-solid <?= $user->role == 'ADMIN' ? 'fa-user-shield' : 'fa-helmet-safety' ?> me-1"></i> 
+                            <?= $user->role == 'ADMIN' ? 'Administrador' : 'Jefe de Obra' ?>
+                        </span>
                     </div>
-                    <h5 class="fw-bold"><?= $user->fullname ?></h5>
-                    <p class="text-muted small"><?= $user->email ?></p>
-                </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Nombre Completo</label>
-                    <input type="text" name="fullname" class="form-control" value="<?= $user->fullname ?>" required>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-secondary text-uppercase">Nombre Completo del Funcionario</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-primary"><i class="fa-solid fa-signature"></i></span>
+                            <input type="text" name="fullname" class="form-control border-start-0 fw-bold" value="<?= htmlspecialchars($user->fullname, ENT_QUOTES, 'UTF-8') ?>" required>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Correo Electrónico</label>
-                    <input type="email" name="email" class="form-control" value="<?= $user->email ?>" required>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-secondary text-uppercase">Correo Corporativo</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="email" name="email" class="form-control border-start-0" value="<?= htmlspecialchars($user->email, ENT_QUOTES, 'UTF-8') ?>" required>
+                        </div>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Rol en Sistema</label>
-                    <select name="role" class="form-select">
-                        <option value="USER" <?= $user->role == 'USER' ? 'selected' : '' ?>>👷 Jefe de Obra</option>
-                        <option value="ADMIN" <?= $user->role == 'ADMIN' ? 'selected' : '' ?>>👨‍💻 Administrador</option>
-                    </select>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-secondary text-uppercase">Nivel de Acceso (Rol)</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-info"><i class="fa-solid fa-sitemap"></i></span>
+                            <select name="role" class="form-select border-start-0 fw-bold text-dark cursor-pointer">
+                                <option value="USER" <?= $user->role == 'USER' ? 'selected' : '' ?>>Operativo - Jefe de Obra</option>
+                                <option value="ADMIN" <?= $user->role == 'ADMIN' ? 'selected' : '' ?>>Máster - Administrador</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold text-danger">Cambiar Contraseña</label>
-                    <input type="password" name="password" class="form-control" placeholder="Dejar en blanco para NO cambiar">
-                    <small class="text-muted">Solo escribe aquí si quieres resetear la clave.</small>
-                </div>
+                    <div class="mb-5 p-3 rounded bg-light border border-danger border-opacity-25">
+                        <label class="form-label small fw-bold text-danger text-uppercase mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Resetear Contraseña</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-white border-end-0 text-danger"><i class="fa-solid fa-lock-open"></i></span>
+                            <input type="password" name="password" id="editPassword" class="form-control border-start-0 border-end-0 border-danger border-opacity-50" placeholder="•••••••• (Dejar en blanco para conservar la actual)">
+                            <button class="btn btn-white border border-start-0 border-danger border-opacity-50 text-secondary" type="button" id="togglePasswordBtn">
+                                <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-2">Si el usuario olvidó su clave, ingrese una nueva aquí. Si no desea alterarla, deje este campo vacío.</small>
+                    </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">
-                        <i class="fa-solid fa-save me-2"></i> Guardar Cambios
-                    </button>
-                </div>
-            </form>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm py-3">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> Actualizar Registro en Sistema
+                        </button>
+                    </div>
+                </form>
 
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const passwordInput = document.getElementById('editPassword');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+        if(togglePasswordBtn) {
+            togglePasswordBtn.addEventListener('click', function() {
+                // Alternar el tipo de input (password a text)
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Alternar el icono (ojo abierto a ojo cerrado)
+                if(type === 'text') {
+                    togglePasswordIcon.classList.remove('fa-eye');
+                    togglePasswordIcon.classList.add('fa-eye-slash');
+                    togglePasswordIcon.classList.add('text-primary');
+                    togglePasswordIcon.classList.remove('text-secondary');
+                } else {
+                    togglePasswordIcon.classList.remove('fa-eye-slash');
+                    togglePasswordIcon.classList.add('fa-eye');
+                    togglePasswordIcon.classList.remove('text-primary');
+                    togglePasswordIcon.classList.add('text-secondary');
+                }
+            });
+        }
+    });
+</script>
 
 <?php require_once 'views/layouts/footer.php'; ?>
