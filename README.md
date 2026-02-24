@@ -49,7 +49,7 @@ El sistema está dividido en dos módulos principales según el rol del usuario,
 
 El código fuente está organizado siguiendo estrictamente el patrón **Modelo-Vista-Controlador (MVC)**, garantizando la escalabilidad y el mantenimiento:
 
-```text
+```
 inventario_android/
 ├── assets/                 # Recursos estáticos del frontend
 │   ├── css/                # Hojas de estilo (styles.css, android-theme.css)
@@ -83,62 +83,64 @@ inventario_android/
 │   └── home.php            # Página principal del sistema
 └── index.php               # Front Controller (Punto de entrada único que enruta las peticiones)
 
+```
 
-
-
-⚙️ Instalación y Configuración Local
+## ⚙️ Instalación y Configuración Local
 
 Sigue estos pasos para desplegar el proyecto en tu entorno de desarrollo local (ej. XAMPP):
 
-    Clonar o descargar el proyecto:
-    Ubica la carpeta inventario_android dentro del directorio público de tu servidor web (por ejemplo, C:\xampp\htdocs\inventario_android).
+Clonar o descargar el proyecto:
+Ubica la carpeta inventario_android dentro del directorio público de tu servidor web (por ejemplo, C:\xampp\htdocs\inventario_android).
 
-    Base de Datos:
+Base de Datos:
 
-        Abre phpMyAdmin (generalmente en http://localhost/phpmyadmin).
+Abre phpMyAdmin (generalmente en http://localhost/phpmyadmin).
+Crea una base de datos nueva (ej. inventario_bd).
 
-        Crea una base de datos nueva (ej. inventario_bd).
+Importa el archivo .sql de tu base de datos (asegúrate de incluir la estructura de las tablas users, tools, assignments, etc.).
 
-        Importa el archivo .sql de tu base de datos (asegúrate de incluir la estructura de las tablas users, tools, assignments, etc.).
+Configurar la conexión a MySQL:
+Abre el archivo config/db.php y ajusta las credenciales de conexión:
 
-    Configurar la conexión a MySQL:
-    Abre el archivo config/db.php y ajusta las credenciales de conexión:
- 
 
-    // Ejemplo de db.php
-    $host = "localhost";
-    $dbname = "inventario_bd"; // Tu nombre de base de datos
-    $user = "root";
+Ejemplo de db.php
+
+```
+$host = "localhost";
+$dbname = "inventario_bd"; // Tu nombre de base de datos
+$user = "root";
     $pass = "";
+```
 
-    Configurar Constantes Globales:
-    Abre el archivo config/parameters.php y asegúrate de que la BASE_URL apunte correctamente a la ruta de tu entorno local:
-  
+**Configurar Constantes Globales:**
+Abre el archivo config/parameters.php y asegúrate de que la BASE_URL apunte correctamente a la ruta de tu entorno local:
 
-    define("BASE_URL", "http://localhost/inventario_android/");
+```
+define("BASE_URL", "http://localhost/inventario_android/");
+```
 
-    Configurar el Servicio de Correo (Opcional pero recomendado):
-    Si deseas probar el restablecimiento de contraseñas y alertas, edita config/MailService.php y añade tus credenciales SMTP (por ejemplo, Gmail con contraseña de aplicación).
+Configurar el Servicio de Correo (Opcional pero recomendado):
+Si deseas probar el restablecimiento de contraseñas y alertas, edita config/MailService.php y añade tus credenciales SMTP (por ejemplo, Gmail con contraseña de aplicación).
 
-    Ejecución:
-    Abre tu navegador web e ingresa a: http://localhost/inventario_android/. Deberías ver la pantalla de inicio o el panel de autenticación.
+Ejecución:
+Abre tu navegador web e ingresa a: http://localhost/inventario_android/. Deberías ver la pantalla de inicio o el panel de autenticación.
 
-💡 Uso del Sistema
+## 💡 Uso del Sistema
 
-    Estructura de Enrutamiento: El sistema utiliza la URL para determinar el controlador y la acción a ejecutar a través del index.php.
+**Estructura de Enrutamiento:** El sistema utiliza la URL para determinar el controlador y la acción a ejecutar a través del index.php.
 
-        Ejemplo: BASE_URL?controller=Auth&action=login cargará el método login dentro del AuthController.
+**Ejemplo:** BASE_URL?controller=Auth&action=login cargará el método login dentro del AuthController.
 
-    Protección de Rutas: Los controladores (AdminController y UserController) verifican al inicio si existe una sesión activa y si el rol del usuario coincide con los permisos requeridos. De lo contrario, redirigen al login.
+**Protección de Rutas:** Los controladores (AdminController y UserController) verifican al inicio si existe una sesión activa y si el rol del usuario coincide con los permisos requeridos. De lo contrario, redirigen al login.
 
-    Componentes Reutilizables: Las vistas cargan dinámicamente el header.php, sidebar.php y footer.php desde la carpeta layouts/ para mantener consistencia en la interfaz.
+**Componentes Reutilizables:** Las vistas cargan dinámicamente el header.php, sidebar.php y footer.php desde la carpeta layouts/ para mantener consistencia en la interfaz.
 
-👨‍💻 Desarrollo
+## 👨‍💻 Desarrollo
 
-Sistema diseñado cuidando los estándares de seguridad web:
+**Sistema diseñado cuidando los estándares de seguridad web:**
 
-    Contraseñas encriptadas mediante password_hash() en PHP.
+Contraseñas encriptadas mediante password_hash() en PHP.
 
-    Prevención de XSS y ataques de inyección de código mediante el saneamiento de variables.
+Prevención de XSS y ataques de inyección de código mediante el saneamiento de variables.
 
-    Interfaz orientada a la experiencia de usuario (UX) con retroalimentación clara mediante validaciones en frontend (validations.js) y respuestas desde el servidor.
+Interfaz orientada a la experiencia de usuario (UX) con retroalimentación clara mediante validaciones en frontend (validations.js) y respuestas desde el servidor.
