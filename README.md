@@ -51,37 +51,91 @@ El código fuente está organizado siguiendo estrictamente el patrón **Modelo-V
 
 ```
 inventario_android/
-├── assets/                 # Recursos estáticos del frontend
-│   ├── css/                # Hojas de estilo (styles.css, android-theme.css)
-│   ├── img/                # Imágenes del sistema, logos, fotos de herramientas y usuarios
-│   └── js/                 # Scripts de frontend (animations.js, map-logic.js, validations.js)
-├── config/                 # Configuraciones globales
-│   ├── db.php              # Conexión a la base de datos MySQL (PDO)
-│   ├── MailService.php     # Configuración y envío de correos (Wrapper de PHPMailer)
-│   └── parameters.php      # Constantes globales (URL base, controladores por defecto)
-├── controllers/            # Lógica de negocio y enrutamiento
-│   ├── AdminController.php # Lógica del panel de administración
-│   ├── ApiController.php   # Endpoints para peticiones asíncronas (AJAX/Fetch)
-│   ├── AuthController.php  # Lógica de login, registro, recuperación y verificación
-│   ├── HomeController.php  # Controlador de la página de inicio o landing
-│   └── UserController.php  # Lógica del panel de operarios
-├── libs/                   # Dependencias de terceros
-│   └── src/                # Archivos de PHPMailer (PHPMailer.php, SMTP.php, Exception.php...)
-├── models/                 # Lógica de base de datos (Consultas CRUD)
-│   ├── AssignmentModel.php # Modelo de asignaciones a proyectos
-│   ├── AuditModel.php      # Modelo de registros de auditoría
-│   ├── MaintenanceModel.php# Modelo de control de taller y reparación
-│   ├── ProjectModel.php    # Modelo de proyectos
-│   ├── RequestModel.php    # Modelo de solicitudes de equipos
-│   ├── ToolModel.php       # Modelo principal del inventario (herramientas)
-│   └── UserModel.php       # Modelo de gestión de usuarios y credenciales
-├── views/                  # Vistas HTML renderizadas
-│   ├── admin/              # Vistas exclusivas del administrador (dashboard, map, qr_catalog, tools...)
-│   ├── auth/               # Vistas de autenticación (login, register, forgot_password...)
-│   ├── layouts/            # Plantillas maestras (header, footer, sidebar)
-│   ├── user/               # Vistas exclusivas del operario (dashboard, my_tools, report_damage...)
-│   └── home.php            # Página principal del sistema
-└── index.php               # Front Controller (Punto de entrada único que enruta las peticiones)
+├── .htaccess                    # Configuración del servidor Apache (seguridad y URLs amigables)
+├── index.php                    # Front Controller: Enruta todas las peticiones hacia los controladores
+│
+├── assets/                      # Recursos estáticos del Frontend
+│   ├── css/
+│   │   ├── android-theme.css    # Hoja de estilos principal con la apariencia "Liquid" de Android
+│   │   └── styles.css           # Estilos generales y complementarios del sistema
+│   ├── img/                     # Almacenamiento de imágenes subidas y estáticas
+│   │   ├── (Fotos de herramientas .webp, .jpg)
+│   │   └── (Fotos de perfil de usuarios .png)
+│   └── js/
+│       ├── animations.js        # Lógica de interacciones, menú lateral, SweetAlerts y animaciones
+│       ├── map-logic.js         # Lógica del mapa interactivo de geolocalización de proyectos
+│       └── validations.js       # Script para validar los formularios en tiempo real
+│
+├── config/                      # Archivos de configuración global
+│   ├── db.php                   # Credenciales y conexión a la base de datos MySQL (PDO)
+│   ├── MailService.php          # Configuración y métodos de envío de correos por SMTP
+│   └── parameters.php           # Definición de constantes como BASE_URL y controladores por defecto
+│
+├── controllers/                 # Controladores (Lógica de negocio e intermediarios)
+│   ├── AdminController.php      # Gestiona todo el panel de administración (CRUDs, dashboard, reportes)
+│   ├── ApiController.php        # Puntos de enlace para peticiones asíncronas (AJAX/Fetch)
+│   ├── AuthController.php       # Lógica de inicio de sesión, registro y restablecimiento de claves
+│   ├── HomeController.php       # Controlador principal de la página de inicio pública
+│   └── UserController.php       # Gestiona el panel de los operarios (mis herramientas, reportes)
+│
+├── libs/                        # Dependencias de terceros
+│   └── src/                     # Archivos fuente de la librería PHPMailer
+│       ├── DSNConfigurator.php
+│       ├── Exception.php        # Manejo de errores de correo
+│       ├── OAuth.php
+│       ├── OAuthTokenProvider.php
+│       ├── PHPMailer.php        # Clase principal para el envío de correos
+│       ├── POP3.php
+│       └── SMTP.php             # Protocolo de transferencia de correo
+│
+├── models/                      # Modelos (Consultas a la base de datos y reglas de datos)
+│   ├── AssignmentModel.php      # Lógica de asignación de herramientas a usuarios y obras
+│   ├── AuditModel.php           # Registro de trazabilidad y movimientos en la caja negra
+│   ├── MaintenanceModel.php     # Gestión de entradas y salidas del taller de reparación
+│   ├── ProjectModel.php         # Gestión de frentes de obra (ubicaciones, clientes, estados)
+│   ├── RequestModel.php         # Manejo de solicitudes de préstamo, soporte y reportes de daño
+│   ├── ToolModel.php            # Catálogo principal de activos, stock, altas y bajas
+│   └── UserModel.php            # Operaciones con los usuarios del sistema (roles, estados)
+│
+└── views/                       # Vistas (Plantillas HTML renderizadas para el cliente)
+    ├── home.php                 # Landing page del sistema
+    │
+    ├── admin/                   # Vistas exclusivas del rol Administrador
+    │   ├── audit_logs.php       # Tabla de auditoría general
+    │   ├── dashboard.php        # Panel de control estadístico (Gráficas Chart.js)
+    │   ├── edit_tool.php        # Formulario de modificación de activos
+    │   ├── edit_user.php        # Formulario de edición de personal
+    │   ├── help_desk.php        # Interfaz de chat/soporte técnico tipo WhatsApp
+    │   ├── map.php              # Mapa de distribución de frentes de obra
+    │   ├── print_reports.php    # Vista optimizada para la impresión de documentos
+    │   ├── profile.php          # Ajustes de perfil del administrador
+    │   ├── qr_catalog.php       # Visualización y generación de etiquetas QR
+    │   ├── reports.php          # Bandeja de entrada de solicitudes operativas
+    │   ├── tools.php            # Tabla principal del inventario general
+    │   ├── users.php            # Tabla de gestión de personal
+    │   └── workshop.php         # Panel de control del área de mantenimiento
+    │
+    ├── auth/                    # Vistas para la autenticación
+    │   ├── forgot_password.php  # Petición de recuperación de clave
+    │   ├── login.php            # Formulario de acceso al sistema
+    │   ├── register.php         # Formulario de creación de cuenta
+    │   ├── reset_password.php   # Formulario de inserción de nueva clave
+    │   ├── verify.php           # Pantalla de éxito tras confirmar cuenta
+    │   └── verify_recovery.php  # Validación de token por correo
+    │
+    ├── layouts/                 # Componentes maestros de la interfaz
+    │   ├── footer.php           # Cierre de HTML y scripts finales
+    │   ├── header.php           # Etiquetas <head>, navbar y barra superior
+    │   └── sidebar.php          # Menú lateral de navegación según rol
+    │
+    └── user/                    # Vistas exclusivas del rol Operario/Usuario
+        ├── catalog.php          # Vista pública del inventario disponible para pedir
+        ├── dashboard.php        # Panel resumido del estado del usuario
+        ├── help_desk.php        # Chat de soporte desde la vista del operario
+        ├── my_tools.php         # Inventario actualmente asignado al operario
+        ├── panel.php            # Vista de bienvenida/informativa secundaria
+        ├── profile.php          # Ajustes de cuenta y cambio de clave del usuario
+        └── report_damage.php    # Formulario para registrar pérdida o daño de un equipo
 
 ```
 
