@@ -92,7 +92,7 @@ Sigue estos pasos para desplegar el proyecto en tu entorno de desarrollo local (
 Clonar o descargar el proyecto:
 Ubica la carpeta inventario_android dentro del directorio público de tu servidor web (por ejemplo, C:\xampp\htdocs\inventario_android).
 
-Base de Datos:
+**Base de Datos:**
 
 Abre phpMyAdmin (generalmente en http://localhost/phpmyadmin).
 Crea una base de datos nueva (ej. inventario_bd).
@@ -103,7 +103,7 @@ Configurar la conexión a MySQL:
 Abre el archivo config/db.php y ajusta las credenciales de conexión:
 
 
-Ejemplo de db.php
+**Ejemplo de db.php:**
 
 ```
 $host = "localhost";
@@ -119,10 +119,10 @@ Abre el archivo config/parameters.php y asegúrate de que la BASE_URL apunte cor
 define("BASE_URL", "http://localhost/inventario_android/");
 ```
 
-Configurar el Servicio de Correo (Opcional pero recomendado):
+**Configurar el Servicio de Correo (Opcional pero recomendado):**
 Si deseas probar el restablecimiento de contraseñas y alertas, edita config/MailService.php y añade tus credenciales SMTP (por ejemplo, Gmail con contraseña de aplicación).
 
-Ejecución:
+**Ejecución:**
 Abre tu navegador web e ingresa a: http://localhost/inventario_android/. Deberías ver la pantalla de inicio o el panel de autenticación.
 
 ## 💡 Uso del Sistema
