@@ -1,81 +1,134 @@
 /* =========================================
-   LAYOUT ESTRUCTURAL & RESPONSIVE (MOBILE FIRST)
+   VARIABLES CORPORATIVAS (THEME INDUSTRIAL)
    ========================================= */
+   :root {
+    --bg-app: #f1f5f9; /* Gris concreto claro para no cansar la vista */
+    --panel-dark: #1e293b; /* Azul pizarra oscuro (Sidebar) */
+    --panel-darker: #0f172a; /* Fondo de acento oscuro */
+    --safety-orange: #ea580c; /* Naranja Alta Visibilidad */
+    --safety-orange-hover: #c2410c;
+    --steel-gray: #64748b;
+    --text-main: #334155;
+    --white: #ffffff;
+    --border-color: #e2e8f0;
+}
 
-   #wrapper {
+body {
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+}
+
+/* =========================================
+   LAYOUT ESTRUCTURAL & RESPONSIVE
+   ========================================= */
+#wrapper {
     display: flex;
     width: 100%;
     align-items: stretch;
     position: relative;
-    overflow-x: hidden; /* Evita scroll horizontal indeseado */
+    overflow-x: hidden;
 }
 
-/* --- SIDEBAR (BARRA LATERAL) --- */
+/* --- SIDEBAR INDUSTRIAL (BARRA LATERAL) --- */
 .sidebar {
     min-width: 280px;
     max-width: 280px;
     height: 100vh;
-    position: fixed; /* Fijo para que no scrollee con la página */
+    position: fixed;
     top: 0;
     left: 0;
-    z-index: 1050; /* Por encima de todo */
+    z-index: 1050;
     overflow-y: auto;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     
-    /* Estilo Liquid Glass para el Sidebar */
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-    border-right: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 5px 0 25px rgba(0, 97, 164, 0.05);
+    /* Diseño Sólido y Robusto ERP */
+    background-color: var(--panel-dark);
+    border-right: 1px solid var(--panel-darker);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
 }
 
 /* Contenido Principal */
 #page-content-wrapper {
     width: 100%;
-    margin-left: 280px; /* Deja espacio para el sidebar en Desktop */
+    margin-left: 280px;
     padding-bottom: 50px;
-    transition: margin 0.4s ease;
+    transition: margin 0.3s ease;
     min-height: 100vh;
 }
 
-/* Items del Menú */
+/* Items del Menú Industrial */
 .sidebar .list-group-item {
     border: none;
-    margin: 4px 15px;
-    border-radius: 12px;
-    font-weight: 500;
-    color: #556;
+    margin: 4px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #94a3b8; /* Gris claro legible */
     transition: all 0.2s;
     background: transparent;
     display: flex;
     align-items: center;
+    padding: 12px 15px;
 }
 
-.sidebar .list-group-item i { width: 25px; text-align: center; }
+.sidebar .list-group-item i { 
+    width: 30px; 
+    text-align: center; 
+    font-size: 1.1rem;
+}
 
 .sidebar .list-group-item:hover {
-    background-color: rgba(255, 255, 255, 0.8);
-    color: var(--primary);
-    transform: translateX(5px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--white);
 }
 
+/* Estado Activo: Alto Contraste */
 .sidebar .list-group-item.active {
-    background: linear-gradient(90deg, var(--primary), #0076c7);
-    color: white !important;
-    box-shadow: 0 8px 20px rgba(0, 97, 164, 0.3);
+    background-color: var(--panel-darker);
+    color: var(--white) !important;
+    border-left: 4px solid var(--safety-orange);
+    border-radius: 0 8px 8px 0;
+    box-shadow: inset 2px 0 5px rgba(0,0,0,0.2);
 }
-.sidebar .list-group-item.active i { color: white !important; }
+.sidebar .list-group-item.active i { color: var(--safety-orange) !important; }
 
-/* --- OVERLAY PARA MÓVILES (Fondo oscuro al abrir menú) --- */
+/* Separadores del Menú */
+.sidebar-label {
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+}
+
+/* --- REEMPLAZO DEL GLASSMORPHISM A SOLID CARDS --- */
+/* Transformamos tu clase antigua "glass-card" en una tarjeta corporativa sólida sin tocar el HTML */
+.glass-card, .navbar-glass {
+    background: var(--white) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 12px;
+}
+
+/* Navbar específico */
+.navbar-glass {
+    border-radius: 0 0 16px 16px;
+    margin-bottom: 2rem !important;
+}
+
+/* --- OVERLAY PARA MÓVILES --- */
 #overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 20, 40, 0.5); /* Azul oscuro semi-transparente */
-    backdrop-filter: blur(4px);
+    background: rgba(15, 23, 42, 0.8); /* Oscuro sólido */
     z-index: 1040;
-    display: none; /* Oculto por defecto */
+    display: none;
     opacity: 0;
     transition: opacity 0.3s;
 }
@@ -88,50 +141,44 @@
 /* =========================================
    MEDIA QUERIES (ADAPTACIÓN A MÓVIL)
    ========================================= */
-
 @media (max-width: 992px) {
-    /* 1. Sidebar oculto por defecto hacia la izquierda */
-    .sidebar {
-        margin-left: -280px; 
-    }
-
-    /* 2. Cuando se activa 'toggled', el sidebar entra (translateX) */
+    .sidebar { margin-left: -280px; }
     #wrapper.toggled .sidebar {
         margin-left: 0;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
     }
-
-    /* 3. El contenido NO se mueve, ocupa el 100% siempre */
     #page-content-wrapper {
         margin-left: 0; 
         width: 100%;
     }
-    
-    /* 4. Navbar ajustado */
     .navbar-glass {
-        margin: 10px;
-        padding: 10px 15px;
+        border-radius: 0;
+        margin: 0 0 1.5rem 0 !important;
     }
 }
 
 @media (min-width: 993px) {
-    /* En PC, si se activa 'toggled', el sidebar se esconde para dar pantalla completa */
-    #wrapper.toggled .sidebar {
-        margin-left: -280px;
-    }
-    
-    #wrapper.toggled #page-content-wrapper {
-        margin-left: 0;
-    }
+    #wrapper.toggled .sidebar { margin-left: -280px; }
+    #wrapper.toggled #page-content-wrapper { margin-left: 0; }
+}
+
+/* Botones Principales Override */
+.btn-primary {
+    background-color: var(--safety-orange) !important;
+    border-color: var(--safety-orange) !important;
+    color: white !important;
+}
+.btn-primary:hover {
+    background-color: var(--safety-orange-hover) !important;
+    border-color: var(--safety-orange-hover) !important;
 }
 
 /* --- ANIMACIONES EXTRA --- */
 .rotate-3d {
     animation: floatAndRotate 6s ease-in-out infinite;
 }
-
 @keyframes floatAndRotate {
     0% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(2deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
     100% { transform: translateY(0) rotate(0deg); }
 }

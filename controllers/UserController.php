@@ -262,7 +262,7 @@ class UserController {
     }
 
     // ==========================================================
-    // MESA DE AYUDA (USUARIO)
+    // MESA DE INCIDENCIAS (SOPORTE CORPORATIVO USUARIO)
     // ==========================================================
     public function helpDesk(){
         $userId = $_SESSION['identity']->id;
@@ -285,9 +285,6 @@ class UserController {
         require_once 'views/user/help_desk.php';
     }
 
-    // ==========================================================
-    // LÓGICA DEL CHAT DE SOPORTE AVANZADO (USUARIO)
-    // ==========================================================
     public function loadChat() {
         error_reporting(0);
         while (ob_get_level()) ob_end_clean();
@@ -298,17 +295,14 @@ class UserController {
             $userId = $_SESSION['identity']->id;
             
             $reqModel = new RequestModel();
-            $userModel = new UserModel();
-
-            // Para el usuario, el estatus que importa es el de algún ADMIN
-            // Aquí podríamos buscar el status del admin principal, o dejar un estado genérico.
-            // Para mantenerlo simple en la vista del usuario, mostraremos "Soporte Activo"
+            
+            // Mantenemos un estatus genérico o podríamos consultar el de los admins.
             $adminStatus = "Soporte Centralizado"; 
 
             // Marcar mensajes del admin como leídos
             $reqModel->markMessagesAsRead($reqId, $userId);
 
-            // Cargar mensajes (filtrando si el usuario vació su chat antes)
+            // Cargar mensajes
             $messages = $reqModel->getChatMessages($reqId, 'USER');
             
             $data = [];
@@ -341,23 +335,25 @@ class UserController {
             
             $reqModel = new RequestModel();
 
+            // Solo se guarda el mensaje en DB. NO SE ENVÍAN CORREOS AQUÍ.
             $saved = $reqModel->saveChatMessage($reqId, $senderId, $msg);
             
             if($saved) {
+                // Al responder, el ticket pasa a estar 'PENDIENTE' de revisión por el admin.
                 $reqModel->updateStatus($reqId, 'PENDIENTE');
 
                 $audit = new AuditModel();
-                $audit->logAction($senderId, 'MESA DE AYUDA', 'MENSAJE_ENVIADO', "El usuario respondió en el ticket #$reqId.");
+                $audit->logAction($senderId, 'SOPORTE', 'MENSAJE_ENVIADO', "El usuario respondió en la bitácora del ticket #$reqId.");
                 
-                echo json_encode(['status' => 'success', 'msg' => 'Mensaje enviado a la central.']);
+                echo json_encode(['status' => 'success', 'msg' => 'Actualización enviada a la central.']);
             } else {
-                echo json_encode(['status' => 'error', 'msg' => 'Error al enviar el mensaje.']);
+                echo json_encode(['status' => 'error', 'msg' => 'Error de conexión. Mensaje no guardado.']);
             }
         }
         exit();
     }
 
-    // Vaciar el historial del chat solo para el usuario
+    // Vaciar el historial del chat solo para el usuario y auditar
     public function clearChat() {
         error_reporting(0);
         while (ob_get_level()) ob_end_clean();
@@ -365,12 +361,17 @@ class UserController {
 
         if(isset($_POST['request_id'])) {
             $reqId = (int)$_POST['request_id'];
+            $userId = $_SESSION['identity']->id;
+
             $reqModel = new RequestModel();
+            $auditModel = new AuditModel();
             
             if($reqModel->clearChat($reqId, 'USER')) {
-                echo json_encode(['status' => 'success', 'msg' => 'Chat vaciado correctamente.']);
+                // Registrar purga de datos por parte del usuario en la caja negra
+                $auditModel->logAction($userId, 'SOPORTE', 'PURGA_CHAT', "El usuario purgó la bitácora local de su ticket #$reqId.");
+                echo json_encode(['status' => 'success', 'msg' => 'Registro de terminal vaciado.']);
             } else {
-                echo json_encode(['status' => 'error', 'msg' => 'Fallo al intentar vaciar el chat.']);
+                echo json_encode(['status' => 'error', 'msg' => 'Fallo al intentar vaciar la consola.']);
             }
         }
         exit();

@@ -1,5 +1,8 @@
 <?php require_once 'views/layouts/header.php'; ?>
 
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
 <style>
     /* Estilos originales */
     .inventory-card {
@@ -18,7 +21,7 @@
         transform: translateY(-5px);
     }
     
-    /* NUEVOS ESTILOS: Timeline del Kardex */
+    /* ESTILOS: Timeline del Kardex */
     .timeline { position: relative; padding: 10px 0; list-style: none; margin: 0; }
     .timeline:before { 
         content: ''; position: absolute; top: 0; bottom: 0; left: 35px; 
@@ -44,6 +47,19 @@
     .timeline-date { font-size: 0.75rem; color: #64748b; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; }
     .timeline-title { font-size: 0.95rem; font-weight: bold; color: #1e293b; margin-bottom: 5px; }
     .timeline-body { font-size: 0.85rem; color: #475569; }
+
+    /* ESTILOS DE DATATABLES PARA QUE ENCAJE CON TU DISEÑO */
+    .dataTables_wrapper .row { align-items: center; margin-bottom: 1rem; }
+    .dataTables_filter input {
+        border-radius: 20px;
+        border: 1px solid #ced4da;
+        padding: 5px 15px;
+        outline: none;
+    }
+    .dataTables_filter input:focus { border-color: #004b87; box-shadow: 0 0 0 0.2rem rgba(0, 75, 135, 0.25); }
+    .page-item.active .page-link { background-color: #004b87; border-color: #004b87; }
+    .page-link { color: #004b87; border-radius: 8px; margin: 0 3px; }
+    table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before { background-color: #004b87; }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -56,9 +72,9 @@
     </button>
 </div>
 
-<div class="glass-card p-0 border-0 shadow-sm overflow-hidden">
+<div class="glass-card p-4 border-0 shadow-sm overflow-hidden bg-white">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0" id="toolsTable">
+        <table class="table table-hover align-middle mb-0 w-100" id="toolsTable">
             <thead class="bg-light text-uppercase small text-muted">
                 <tr>
                     <th class="ps-4" style="width: 80px;">Fotografía</th>
@@ -73,12 +89,15 @@
                     <?php while($tool = $herramientas->fetch_object()): ?>
                     <tr>
                         <td class="ps-4 py-3">
-                            <img src="<?= base_url ?>assets/img/<?= $tool->image ?>" class="rounded shadow-sm border" width="55" height="55" style="object-fit:cover;">
+                            <img src="<?= base_url ?>assets/img/<?= $tool->image ?>" class="rounded shadow-sm border bg-white" width="55" height="55" style="object-fit:contain; padding: 2px;">
                         </td>
                         <td>
-                            <div class="fw-bold text-dark fs-6"><?= $tool->name ?></div>
+                            <div class="fw-bold text-dark fs-6">
+                                <?= htmlspecialchars($tool->name, ENT_QUOTES) ?> 
+                                <span class="badge bg-light text-muted border ms-2" style="font-size: 0.65rem;">REF-<?= str_pad($tool->id, 4, "0", STR_PAD_LEFT) ?></span>
+                            </div>
                             <span class="badge bg-light text-secondary border border-secondary mt-1">
-                                <i class="fa-solid fa-tag me-1"></i> <?= str_replace('_', ' ', $tool->category) ?>
+                                <i class="fa-solid fa-tag me-1"></i> <?= str_replace('_', ' ', htmlspecialchars($tool->category, ENT_QUOTES)) ?>
                             </span>
                         </td>
                         <td class="text-center">
@@ -132,13 +151,7 @@
                     </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="fa-solid fa-boxes-stacked fa-2x mb-3 text-secondary"></i>
-                            <p class="mb-0 fw-bold">El inventario maestro se encuentra vacío.</p>
-                        </td>
-                    </tr>
-                <?php endif; ?>
+                    <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -221,12 +234,12 @@
             <div class="modal-body p-0 bg-white">
                 
                 <div class="d-flex align-items-center p-4 border-bottom bg-light">
-                    <img id="kxToolImage" src="" class="rounded shadow border border-secondary me-3" width="70" height="70" style="object-fit:cover;">
+                    <img id="kxToolImage" src="" class="rounded shadow border border-secondary me-3 bg-white" width="70" height="70" style="object-fit:contain; padding: 2px;">
                     <div>
                         <h5 id="kxToolName" class="fw-bold mb-1 text-dark">Nombre de Herramienta</h5>
-                        <div class="d-flex gap-2 align-items-center">
-                            <span id="kxToolCategory" class="badge bg-secondary">Categoria</span>
-                            <span class="badge border border-primary text-primary bg-white fw-bold">Unidades Activas: <span id="kxToolStock">0</span></span>
+                        <div class="d-flex gap-2 align-items-center mt-2">
+                            <span id="kxToolCategory" class="badge bg-secondary px-2 py-1">Categoria</span>
+                            <span class="badge border border-primary text-primary bg-white fw-bold px-2 py-1">Unidades Activas: <span id="kxToolStock">0</span></span>
                         </div>
                     </div>
                 </div>
@@ -238,15 +251,39 @@
 
             </div>
             <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-dark fw-bold px-4" data-bs-dismiss="modal">Cerrar Historial</button>
+                <button type="button" class="btn btn-dark fw-bold px-4 rounded-pill" data-bs-dismiss="modal">Cerrar Historial</button>
             </div>
         </div>
     </div>
 </div>
 
+<?php require_once 'views/layouts/footer.php'; ?>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    // Inicializar DataTables para el Catálogo de Herramientas
+    $(document).ready(function() {
+        $('#toolsTable').DataTable({
+            responsive: true,
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
+                "emptyTable": "El inventario maestro se encuentra vacío en este momento."
+            },
+            pageLength: 10, // Mostrar 10 registros por página
+            lengthMenu: [ [5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"] ],
+            order: [[1, "asc"]], // Ordenar por nombre alfabéticamente por defecto
+            columnDefs: [
+                { orderable: false, targets: [0, 4] } // Quitar orden a las columnas de foto y acciones
+            ]
+        });
+    });
+
     // Función para abrir el Kardex y cargar la vida del Activo
     function openKardex(toolId) {
         // Mostrar alerta de carga
@@ -257,14 +294,14 @@
             didOpen: () => { Swal.showLoading(); }
         });
 
-        // Petición AJAX al controlador que acabamos de crear
+        // Petición AJAX al controlador
         $.get('<?= base_url ?>Admin/getToolHistory?id=' + toolId, function(response) {
             if(response.status === 'success') {
                 Swal.close();
                 
                 // Llenar datos de cabecera
                 $('#kxToolName').text(response.tool.name);
-                $('#kxToolCategory').text(response.tool.category);
+                $('#kxToolCategory').text(response.tool.category.replace(/_/g, ' '));
                 $('#kxToolStock').text(response.tool.stock_available + ' de ' + response.tool.stock_total);
                 
                 let imgSrc = response.tool.image ? response.tool.image : 'default.png';
@@ -277,28 +314,28 @@
                     response.data.forEach(function(mov) {
                         let icon = 'fa-circle-info';
                         let bgClass = 'bg-secondary';
-                        let typeLabel = mov.type.replace('_', ' ');
+                        let typeLabel = mov.movement_type ? mov.movement_type.replace(/_/g, ' ') : mov.type.replace(/_/g, ' ');
                         let badgeColor = 'bg-secondary';
                         
                         // Sistema de colores inteligente según el tipo de movimiento
-                        if(mov.type === 'ENTRADA') { 
+                        if(typeLabel.includes('ENTRADA') || typeLabel.includes('INGRESO')) { 
                             icon = 'fa-arrow-down'; bgClass = 'bg-success'; badgeColor = 'bg-success';
                         }
-                        else if(mov.type === 'SALIDA_PRESTAMO') { 
+                        else if(typeLabel.includes('SALIDA') || typeLabel.includes('PRESTAMO')) { 
                             icon = 'fa-helmet-safety'; bgClass = 'bg-primary'; badgeColor = 'bg-primary';
                         }
-                        else if(mov.type === 'DEVOLUCION') { 
+                        else if(typeLabel.includes('DEVOLUCION')) { 
                             icon = 'fa-arrow-rotate-left'; bgClass = 'bg-info text-dark'; badgeColor = 'bg-info text-dark';
                         }
-                        else if(mov.type === 'BAJA_DAÑO') { 
+                        else if(typeLabel.includes('BAJA') || typeLabel.includes('DAÑO')) { 
                             icon = 'fa-triangle-exclamation'; bgClass = 'bg-danger'; badgeColor = 'bg-danger';
                         }
-                        else if(mov.type === 'AJUSTE_INVENTARIO') { 
+                        else if(typeLabel.includes('AJUSTE')) { 
                             icon = 'fa-sliders'; bgClass = 'bg-dark'; badgeColor = 'bg-dark';
                         }
                         
-                        let comments = mov.comments ? `<div class="mt-2 p-2 bg-light border rounded small text-muted"><i class="fa-solid fa-quote-left me-1 text-secondary"></i>${mov.comments}</div>` : '';
-                        let user = mov.fullname ? `<strong>${mov.fullname}</strong> <span class="badge bg-light text-dark border ms-1">${mov.role}</span>` : '<strong>Administrador de Sistema</strong>';
+                        let comments = mov.notes ? `<div class="mt-2 p-2 bg-light border rounded small text-muted"><i class="fa-solid fa-quote-left me-1 text-secondary"></i>${mov.notes}</div>` : '';
+                        let user = mov.admin_name ? `<strong>${mov.admin_name}</strong> <span class="badge bg-light text-dark border ms-1">Responsable Operación</span>` : '<strong>Administrador de Sistema</strong>';
 
                         timelineHtml += `
                         <li class="timeline-item">
@@ -311,7 +348,6 @@
                                 <div class="timeline-title text-primary"><i class="fa-solid fa-cubes me-1"></i> Movimiento de ${mov.quantity} Unidad(es)</div>
                                 <div class="timeline-body mt-2">
                                     <div class="mb-1"><i class="fa-solid fa-user-tag text-secondary me-1" style="width: 15px;"></i> ${user}</div>
-                                    <div><i class="fa-solid fa-calculator text-secondary me-1" style="width: 15px;"></i> Existencias resultantes: <strong>${mov.stock_after}</strong> <small class="text-muted">(Anterior: ${mov.stock_before})</small></div>
                                     ${comments}
                                 </div>
                             </div>
@@ -341,5 +377,3 @@
         });
     }
 </script>
-
-<?php require_once 'views/layouts/footer.php'; ?>

@@ -35,24 +35,28 @@ class RequestModel {
 
     // --- MÉTODOS DE LECTURA ---
     
+    // MODIFICADO: Ahora ordena por la fecha del último mensaje en el chat, si no hay chat, usa la fecha de creación del ticket.
     public function getAll(){
         $sql = "SELECT r.id AS request_unique_id, r.user_id, r.tool_id, r.project_id, r.type, r.description, r.admin_reply, r.status, 
                        r.expected_date, r.return_date, r.order_notes, r.created_at, r.quantity,
                        u.fullname, u.role,
-                       t.name as tool_name, t.image as tool_image
+                       t.name as tool_name, t.image as tool_image,
+                       (SELECT MAX(created_at) FROM ticket_chat WHERE request_id = r.id) as last_activity
                 FROM requests r 
                 LEFT JOIN users u ON r.user_id = u.id 
                 LEFT JOIN tools t ON r.tool_id = t.id
-                ORDER BY r.created_at DESC";
+                ORDER BY COALESCE(last_activity, r.created_at) DESC";
         return $this->db->query($sql);
     }
 
+    // MODIFICADO: Mismo ordenamiento dinámico estilo WhatsApp pero para el operario.
     public function getRequestsByUser($user_id){
-        $sql = "SELECT r.*, t.name as tool_name 
+        $sql = "SELECT r.*, t.name as tool_name,
+                       (SELECT MAX(created_at) FROM ticket_chat WHERE request_id = r.id AND deleted_by_user = 0) as last_activity
                 FROM requests r 
                 LEFT JOIN tools t ON r.tool_id = t.id
                 WHERE r.user_id = ? AND r.visible_user = 1 
-                ORDER BY r.created_at DESC";
+                ORDER BY COALESCE(last_activity, r.created_at) DESC";
         $stmt = $this->db->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -73,10 +77,9 @@ class RequestModel {
     }
 
     // ====================================================================
-    // MÉTODOS AVANZADOS PARA EL CHAT DE SOPORTE (ESTILO WHATSAPP)
+    // MÉTODOS AVANZADOS PARA EL CHAT DE SOPORTE (TICKETS)
     // ====================================================================
     
-    // Obtener mensajes filtrando los que hayan sido eliminados por este rol
     public function getChatMessages($request_id, $role = 'ADMIN') {
         $filter = ($role == 'USER') ? "AND c.deleted_by_user = 0" : "AND c.deleted_by_admin = 0";
         
@@ -93,7 +96,6 @@ class RequestModel {
         return $result;
     }
 
-    // Marca como leídos los mensajes donde el lector NO fue el remitente
     public function markMessagesAsRead($request_id, $reader_id) {
         $sql = "UPDATE ticket_chat SET is_read = 1 WHERE request_id = ? AND sender_id != ? AND is_read = 0";
         $stmt = $this->db->prepare($sql);
@@ -102,7 +104,6 @@ class RequestModel {
         $stmt->close();
     }
 
-    // Borrado independiente de chat
     public function clearChat($request_id, $role) {
         $field = ($role == 'USER') ? 'deleted_by_user' : 'deleted_by_admin';
         $sql = "UPDATE ticket_chat SET $field = 1 WHERE request_id = ?";
@@ -117,7 +118,6 @@ class RequestModel {
         return $result;
     }
 
-    // Obtener cantidad de mensajes no leídos (Globo de notificación)
     public function getUnreadCount($request_id, $user_id) {
         $sql = "SELECT COUNT(*) as unread FROM ticket_chat WHERE request_id = ? AND sender_id != ? AND is_read = 0";
         $stmt = $this->db->prepare($sql);

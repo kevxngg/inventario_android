@@ -1,50 +1,81 @@
 <?php require_once 'views/layouts/header.php'; ?>
 
 <style>
+    /* ==============================================
+       ESTILOS INDUSTRIALES - TICKETS DE USUARIO
+       ============================================== */
     .helpdesk-container {
         height: calc(100vh - 120px);
         display: flex;
-        border-radius: 12px;
+        border-radius: 8px; /* Menos redondeado para aspecto industrial */
         overflow: hidden;
-        background-color: #ffffff;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        border: 1px solid #e2e8f0;
+        background-color: var(--white);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: 2px solid var(--panel-dark); /* Borde rígido */
     }
     
+    /* Panel Lateral (Lista de Tickets) */
     .chat-sidebar {
         width: 350px;
-        background-color: #f8fafc;
-        border-right: 1px solid #e2e8f0;
+        background-color: var(--bg-app);
+        border-right: 2px solid var(--border-color);
         display: flex;
         flex-direction: column;
+    }
+    
+    /* Pestañas de filtrado (Bootstrap Nav-Tabs adaptadas) */
+    .nav-tickets {
+        background-color: var(--panel-darker);
+        padding: 10px 10px 0 10px;
+    }
+    .nav-tickets .nav-link {
+        color: #94a3b8;
+        border: none;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 10px 12px;
+    }
+    .nav-tickets .nav-link:hover { color: white; }
+    .nav-tickets .nav-link.active {
+        color: var(--safety-orange);
+        background-color: transparent;
+        border-bottom: 3px solid var(--safety-orange);
     }
     
     .chat-list { overflow-y: auto; flex-grow: 1; }
     
     .ticket-item {
         padding: 15px;
-        border-bottom: 1px solid #e2e8f0;
+        border-bottom: 1px solid var(--border-color);
         cursor: pointer;
         transition: all 0.2s ease;
+        border-left: 4px solid transparent;
+        background-color: var(--white);
     }
     
-    .ticket-item:hover, .ticket-item.active { background-color: #eef2f6; }
+    .ticket-item:hover, .ticket-item.active { 
+        background-color: rgba(30, 41, 59, 0.05); 
+        border-left: 4px solid var(--panel-dark); 
+    }
     
+    /* Área Principal (Consola) */
     .chat-main {
         flex-grow: 1;
         display: flex;
         flex-direction: column;
-        background-color: #e5ddd5;
-        background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+        background-color: #f8fafc; /* Gris técnico limpio, sin texturas informales */
     }
     
     .chat-header {
-        background-color: #0d6efd; 
-        color: white;
+        background-color: var(--white);
+        border-bottom: 2px solid var(--border-color);
+        color: var(--panel-darker);
         padding: 15px 20px;
         display: flex;
         align-items: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         z-index: 10;
     }
     
@@ -54,44 +85,50 @@
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
     
+    /* Diseño de Ticket / Terminal */
     .message-bubble {
-        max-width: 75%;
-        padding: 10px 15px;
-        border-radius: 10px;
+        max-width: 85%;
+        padding: 12px 15px;
+        border-radius: 4px; /* Bordes cuadrados */
         position: relative;
         font-size: 0.95rem;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
     }
     
     .message-me {
-        background-color: #dcf8c6;
+        background-color: var(--white);
         align-self: flex-end;
-        border-bottom-right-radius: 0;
+        border-left: 4px solid var(--safety-orange); /* Color del Operario */
     }
     
     .message-admin {
-        background-color: #ffffff;
+        background-color: rgba(30, 41, 59, 0.05);
         align-self: flex-start;
-        border-bottom-left-radius: 0;
+        border-left: 4px solid var(--panel-dark); /* Color de la Administración */
     }
     
+    /* Input de datos */
     .chat-input-area {
-        background-color: #f0f0f0;
+        background-color: var(--white);
         padding: 15px 20px;
         display: flex;
         gap: 10px;
         align-items: center;
+        border-top: 2px solid var(--border-color);
     }
     
     .chat-input-area input {
-        border-radius: 25px;
-        padding: 10px 20px;
-        border: none;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        padding: 12px 20px;
+        border: 2px solid var(--panel-dark); /* Borde sólido */
+        font-family: monospace;
+        font-weight: bold;
     }
+    .chat-input-area input:focus { box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
     
     .empty-state {
         display: flex;
@@ -99,98 +136,159 @@
         align-items: center;
         justify-content: center;
         height: 100%;
-        color: #64748b;
     }
 </style>
 
 <div class="container-fluid p-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h3 class="fw-bold text-dark m-0"><i class="fa-solid fa-headset me-2 text-primary"></i> Centro de Soporte</h3>
-            <p class="text-muted mb-0">Comunícate directamente con la central administrativa.</p>
+            <h3 class="fw-bold" style="color: var(--panel-darker);"><i class="fa-solid fa-headset me-2" style="color: var(--safety-orange);"></i> Mis Tickets de Soporte</h3>
+            <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">Comunicación cifrada con la base central.</p>
         </div>
     </div>
 
     <div class="helpdesk-container">
+        
         <div class="chat-sidebar">
-            <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
-                <span class="fw-bold text-secondary">Mis Reportes</span>
-                <span class="badge bg-primary rounded-pill"><?= count($tickets) ?></span>
-            </div>
-            
-            <div class="chat-list">
-                <?php if(!empty($tickets)): ?>
-                    <?php foreach($tickets as $t): ?>
-                        <div class="ticket-item position-relative" onclick="openChat(<?= $t->request_unique_id ?>, '<?= addslashes($t->description) ?>', this)">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <span class="fw-bold text-dark">
-                                    <?= $t->fullname ?>
-                                </span>
-                                <small class="text-muted" style="font-size: 0.7rem;"><?= date('d/m', strtotime($t->created_at)) ?></small>
-                            </div>
-                            <div class="small text-secondary mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                <?= $t->description ?>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <?php if($t->status == 'PENDIENTE'): ?>
-                                        <span class="badge bg-warning text-dark px-2" style="font-size: 0.65rem;">Esperando Respuesta</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-success px-2" style="font-size: 0.65rem;">Ticket Resuelto</span>
-                                    <?php endif; ?>
-                                </div>
-                                <?php if($t->unread_count > 0): ?>
-                                    <span class="badge bg-primary rounded-circle px-2"><?= $t->unread_count ?></span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="p-4 text-center text-muted small mt-5">
-                        <i class="fa-solid fa-face-smile fa-2x mb-2 opacity-50"></i><br>
-                        No tienes reportes de daños o incidencias activos.
+            <ul class="nav nav-tabs nav-tickets" id="ticketTabsUser" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-user-pendientes" data-bs-toggle="tab" data-bs-target="#pane-user-pendientes" type="button" role="tab">En Proceso</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-user-resueltos" data-bs-toggle="tab" data-bs-target="#pane-user-resueltos" type="button" role="tab">Cerrados</button>
+                </li>
+                <li class="nav-item ms-auto" role="presentation">
+                    <div class="text-white fw-bold d-flex align-items-center h-100 pe-2" style="font-size: 0.8rem;">
+                        Total: <?= count($tickets) ?>
                     </div>
-                <?php endif; ?>
+                </li>
+            </ul>
+            
+            <div class="tab-content chat-list custom-scroll" id="ticketTabsUserContent">
+                
+                <div class="tab-pane fade show active" id="pane-user-pendientes" role="tabpanel">
+                    <?php 
+                        $hasPendientes = false;
+                        if(!empty($tickets)): 
+                            foreach($tickets as $t): 
+                                if($t->status == 'PENDIENTE'):
+                                    $hasPendientes = true;
+                                    $displayUnread = $t->unread_count > 9 ? '9+' : $t->unread_count;
+                    ?>
+                                    <div class="ticket-item position-relative" onclick="openChat(<?= $t->request_unique_id ?>, '<?= addslashes($t->description) ?>', this)">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <span class="fw-bold text-dark text-uppercase" style="font-size: 0.85rem;">
+                                                Ticket #<?= str_pad($t->request_unique_id, 4, '0', STR_PAD_LEFT) ?>
+                                            </span>
+                                            <small class="text-muted font-monospace fw-bold" style="font-size: 0.7rem;">
+                                                <?= date('d/M H:i', strtotime($t->last_activity ?? $t->created_at)) ?>
+                                            </small>
+                                        </div>
+                                        <div class="small text-secondary mb-2 fw-bold font-monospace" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            > <?= $t->description ?>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge text-dark px-2 shadow-sm" style="background-color: #eab308; font-size: 0.65rem;">En Proceso</span>
+                                            <?php if($t->unread_count > 0): ?>
+                                                <span class="badge rounded px-2" style="background-color: var(--safety-orange);"><?= $displayUnread ?> Msg</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                    <?php 
+                                endif;
+                            endforeach; 
+                        endif; 
+                        if(!$hasPendientes):
+                    ?>
+                        <div class="p-4 text-center text-muted small mt-5">
+                            <i class="fa-solid fa-clipboard-check fa-3x mb-3 opacity-25"></i><br>
+                            <span class="fw-bold text-uppercase">Bandeja Limpia.</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="tab-pane fade" id="pane-user-resueltos" role="tabpanel">
+                    <?php 
+                        $hasCerrados = false;
+                        if(!empty($tickets)): 
+                            foreach($tickets as $t): 
+                                if($t->status != 'PENDIENTE'):
+                                    $hasCerrados = true;
+                                    $displayUnread = $t->unread_count > 9 ? '9+' : $t->unread_count;
+                                    $badgeColor = ($t->status == 'RESUELTO' || $t->status == 'APROBADO') ? 'bg-success' : 'bg-danger';
+                    ?>
+                                    <div class="ticket-item position-relative" onclick="openChat(<?= $t->request_unique_id ?>, '<?= addslashes($t->description) ?>', this)">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <span class="fw-bold text-dark text-uppercase" style="font-size: 0.85rem;">
+                                                Ticket #<?= str_pad($t->request_unique_id, 4, '0', STR_PAD_LEFT) ?>
+                                            </span>
+                                            <small class="text-muted font-monospace fw-bold" style="font-size: 0.7rem;">
+                                                <?= date('d/M H:i', strtotime($t->last_activity ?? $t->created_at)) ?>
+                                            </small>
+                                        </div>
+                                        <div class="small text-secondary mb-2 fw-bold font-monospace" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            > <?= $t->description ?>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge <?= $badgeColor ?> px-2 shadow-sm" style="font-size: 0.65rem;"><?= $t->status ?></span>
+                                            <?php if($t->unread_count > 0): ?>
+                                                <span class="badge rounded px-2" style="background-color: var(--safety-orange);"><?= $displayUnread ?> Msg</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                    <?php 
+                                endif;
+                            endforeach; 
+                        endif; 
+                        if(!$hasCerrados):
+                    ?>
+                        <div class="p-4 text-center text-muted small mt-5">
+                            <i class="fa-solid fa-folder-open fa-3x mb-3 opacity-25"></i><br>
+                            <span class="fw-bold text-uppercase">No hay historial cerrado.</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
             </div>
         </div>
 
         <div class="chat-main" id="chatWindow" style="display: none;">
             <div class="chat-header">
-                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm" style="width: 45px; height: 45px; font-size: 1.2rem;">
+                <div class="rounded d-flex align-items-center justify-content-center fw-bold me-3 shadow-sm" style="width: 45px; height: 45px; font-size: 1.2rem; background-color: var(--panel-dark); color: white;">
                     <i class="fa-solid fa-building-shield"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h5 class="m-0 fw-bold">Administración Central</h5>
-                    <small class="text-white-50" id="chatAdminStatus">Soporte Técnico en Línea</small>
+                    <h5 class="m-0 fw-bold text-uppercase" style="letter-spacing: 1px;">Soporte Central</h5>
+                    <small class="text-muted font-monospace fw-bold" id="chatAdminStatus">Estableciendo conexión...</small>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-outline-light rounded-circle" title="Vaciar chat" onclick="clearMyChat()" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa-solid fa-trash-can"></i>
+                    <button class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3" title="Purgar chat local" onclick="clearMyChat()">
+                        <i class="fa-solid fa-eraser me-1"></i> Purgar Datos
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white p-3 border-bottom shadow-sm z-1" style="font-size: 0.85rem;">
-                <span class="fw-bold text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i> Mi Reporte Original:</span> 
-                <span id="chatIssueDesc" class="text-secondary fst-italic"></span>
+            <div class="p-3 border-bottom shadow-sm z-1" style="background-color: var(--bg-app); font-size: 0.85rem; border-left: 4px solid var(--safety-orange);">
+                <span class="fw-bold text-dark text-uppercase"><i class="fa-solid fa-hashtag me-1"></i> Detalle Inicial:</span> 
+                <span id="chatIssueDesc" class="text-secondary fw-bold font-monospace"></span>
             </div>
 
-            <div class="chat-messages" id="chatMessagesBox">
-            </div>
+            <div class="chat-messages custom-scroll" id="chatMessagesBox">
+                </div>
 
             <form id="chatForm" class="chat-input-area border-top z-1">
-                <input type="text" id="chatInputMsg" class="form-control" placeholder="Escribe un mensaje al administrador..." required autocomplete="off">
-                <button type="submit" class="btn btn-primary rounded-circle shadow-sm" style="width: 45px; height: 45px;" id="btnSendMsg">
-                    <i class="fa-solid fa-paper-plane"></i>
+                <input type="text" id="chatInputMsg" class="form-control" placeholder="Añadir datos a la bitácora..." required autocomplete="off">
+                <button type="submit" class="btn fw-bold shadow-sm px-4" style="background-color: var(--safety-orange); color: white; border-radius: 4px;" id="btnSendMsg">
+                    <i class="fa-solid fa-share me-1"></i> Reportar
                 </button>
             </form>
         </div>
 
         <div class="chat-main empty-state" id="emptyStateWindow">
-            <div class="text-center text-muted" style="background: rgba(255,255,255,0.8); padding: 40px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                <i class="fa-solid fa-headset fa-4x mb-3 text-primary opacity-50"></i>
-                <h4 class="fw-bold text-dark">Centro de Soporte</h4>
-                <p>Selecciona un reporte de la lista para ver las respuestas de administración.</p>
+            <div class="text-center" style="background: var(--white); padding: 40px; border-radius: 8px; border: 2px dashed var(--border-color);">
+                <i class="fa-solid fa-satellite-dish fa-4x mb-3" style="color: var(--panel-dark);"></i>
+                <h4 class="fw-bold text-uppercase" style="color: var(--panel-darker); letter-spacing: 1px;">Transmisión Segura</h4>
+                <p class="text-muted fw-bold small">Seleccione un reporte para visualizar las órdenes de la central.</p>
             </div>
         </div>
 
@@ -199,6 +297,7 @@
 
 <?php require_once 'views/layouts/footer.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let currentTicketId = null;
 
@@ -206,14 +305,15 @@
         document.querySelectorAll('.ticket-item').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
 
-        let badge = element.querySelector('.bg-primary.rounded-circle');
+        // Ocultar globo si existe (al abrir el chat)
+        let badge = element.querySelector('.badge[style*="background-color: var(--safety-orange)"]');
         if(badge) badge.style.display = 'none';
 
         document.getElementById('emptyStateWindow').style.display = 'none';
         document.getElementById('chatWindow').style.display = 'flex';
 
         currentTicketId = id;
-        document.getElementById('chatIssueDesc').innerText = '"' + description + '"';
+        document.getElementById('chatIssueDesc').innerText = '> ' + description;
 
         loadChatMessages();
     }
@@ -226,35 +326,38 @@
             box.innerHTML = '';
             
             if(res.admin_status) {
-                document.getElementById('chatAdminStatus').innerText = res.admin_status;
+                document.getElementById('chatAdminStatus').innerText = "ESTADO CENTRAL: " + res.admin_status.toUpperCase();
             }
 
             if(res.data && res.data.length > 0) {
                 res.data.forEach(msg => {
                     const isMe = (msg.sender_id == '<?= $_SESSION["identity"]->id ?>');
                     const bubbleClass = isMe ? 'message-me' : 'message-admin';
-                    const senderName = isMe ? 'Yo' : 'Administrador';
+                    const senderName = isMe ? 'MI REPORTE' : 'ADMINISTRACIÓN';
+                    const iconColor = isMe ? 'var(--safety-orange)' : 'var(--panel-dark)';
 
                     let checks = '';
                     if(isMe) {
                         checks = (msg.is_read == 1) 
-                            ? '<i class="fa-solid fa-check-double ms-1 text-primary"></i>'
+                            ? '<i class="fa-solid fa-check-double ms-1" style="color: #10b981;"></i>'
                             : '<i class="fa-solid fa-check ms-1 text-secondary"></i>';
                     }
 
                     box.innerHTML += `
                         <div class="message-bubble ${bubbleClass}">
-                            <div class="fw-bold mb-1" style="font-size: 0.70rem; color: ${isMe ? '#004b87' : '#d33'};">${senderName}</div>
-                            <div>${msg.message}</div>
-                            <div class="text-end mt-1 opacity-75" style="font-size: 0.65rem;">
-                                ${msg.time} ${checks}
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-2">
+                                <div class="fw-bold text-uppercase" style="font-size: 0.70rem; color: ${iconColor}; letter-spacing: 0.5px;">
+                                    <i class="fa-solid fa-terminal me-1"></i> ${senderName}
+                                </div>
+                                <div class="text-muted font-monospace fw-bold" style="font-size: 0.7rem;">${msg.time} ${checks}</div>
                             </div>
+                            <div class="font-monospace text-dark fw-bold">> ${msg.message}</div>
                         </div>
                     `;
                 });
                 box.scrollTop = box.scrollHeight;
             } else {
-                box.innerHTML = `<div class="text-center mt-4 text-muted small bg-white p-3 rounded mx-auto shadow-sm" style="max-width: 80%;">El ticket está abierto. Puedes enviar un mensaje a la central.</div>`;
+                box.innerHTML = `<div class="text-center mt-4"><span class="badge bg-light text-dark border p-2 font-monospace shadow-sm">CONEXIÓN ESTABLECIDA. ESPERANDO DATOS.</span></div>`;
             }
         }, 'json');
     }
@@ -276,12 +379,12 @@
 
         $.post('<?= base_url ?>User/sendChatMessage', {request_id: currentTicketId, message: msg}, function(res) {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+            btn.innerHTML = '<i class="fa-solid fa-share me-1"></i> Reportar';
             if(res.status === 'success') {
                 input.value = '';
                 loadChatMessages();
             } else {
-                Swal.fire('Error', res.msg, 'error');
+                Swal.fire('Error de Transmisión', res.msg, 'error');
             }
         }, 'json');
     });
@@ -289,12 +392,14 @@
     function clearMyChat() {
         if(!currentTicketId) return;
         Swal.fire({
-            title: '¿Vaciar chat?',
-            text: "Los mensajes se borrarán de tu dispositivo.",
+            title: '¿Purgar Registro Local?',
+            text: "Los datos se borrarán de este dispositivo. La central conservará su copia.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Sí, vaciar'
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Sí, purgar',
+            cancelButtonText: 'Cancelar'
         }).then((res) => {
             if(res.isConfirmed) {
                 $.post('<?= base_url ?>User/clearChat', {request_id: currentTicketId}, function(response){

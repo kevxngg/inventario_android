@@ -18,15 +18,54 @@ if($optionsHtml == ''){
 $today = date('Y-m-d');
 ?>
 
+<style>
+    /* Diseño Industrial para el Catálogo */
+    .tool-card {
+        background-color: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 8px; /* Menos redondeado, más rudo */
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+    }
+    .tool-card:hover {
+        border-color: var(--panel-dark);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15);
+    }
+    .tool-image-container {
+        background-color: #f8fafc;
+        border-bottom: 2px solid var(--border-color);
+        position: relative;
+    }
+    
+    /* Input Search Fuerte */
+    .search-box {
+        background-color: var(--white);
+        border: 2px solid var(--panel-dark);
+        border-radius: 8px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .search-box input { font-weight: bold; color: var(--panel-darker); }
+    .search-box input:focus { box-shadow: none; background: transparent; }
+    
+    /* Botón Flotante Carrito */
+    .btn-cart-float {
+        background-color: var(--panel-darker) !important;
+        border: 2px solid var(--safety-orange) !important;
+        color: white !important;
+    }
+    .btn-cart-float:hover { background-color: var(--safety-orange) !important; border-color: var(--panel-darker) !important; }
+</style>
+
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h2 class="fw-bold text-primary-dark"><i class="fa-solid fa-list-check me-2"></i>Catálogo de Activos</h2>
-        <p class="text-muted mb-0">Selecciona las herramientas y agrégalas a tu orden de pedido logística.</p>
+        <h2 class="fw-bold" style="color: var(--panel-darker);"><i class="fa-solid fa-list-check me-2" style="color: var(--safety-orange);"></i>Catálogo de Activos</h2>
+        <p class="text-muted fw-bold mb-0 text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">Añadir herramientas a la orden de despacho</p>
     </div>
     
-    <div class="search-box glass-card py-2 px-3 d-flex align-items-center">
-        <i class="fa-solid fa-magnifying-glass text-muted me-2"></i>
-        <input type="text" id="searchInput" class="form-control border-0 bg-transparent shadow-none" placeholder="Buscar maquinaria..." style="min-width: 250px;" onkeyup="filterCatalog()">
+    <div class="search-box py-2 px-3 d-flex align-items-center">
+        <i class="fa-solid fa-magnifying-glass text-dark me-2"></i>
+        <input type="text" id="searchInput" class="form-control border-0 bg-transparent shadow-none" placeholder="Buscar por referencia o tipo..." style="min-width: 250px;" onkeyup="filterCatalog()">
     </div>
 </div>
 
@@ -42,53 +81,55 @@ $today = date('Y-m-d');
                 $badgeText = 'Disponible';
                 $cardOpacity = '1';
                 $grayscale = 'none';
-                $btnClass = 'btn-android';
-                $btnText = 'Agregar a la Orden';
+                $btnClass = 'btn-primary'; // Naranja (Estilo Industrial)
+                $btnText = 'Añadir a Despacho';
                 $btnDisabled = '';
 
                 if($stock > 0 && $stock <= 5){
-                    $badgeClass = 'bg-warning text-dark';
+                    $badgeClass = 'text-dark';
+                    $badgeStyle = 'background-color: #eab308;'; // Amarillo Alerta
                     $badgeText = 'Inventario Crítico';
-                }
+                } else { $badgeStyle = ''; }
 
                 if($isAgotado){
                     $badgeClass = 'bg-secondary';
+                    $badgeStyle = '';
                     $badgeText = 'Sin Existencias';
-                    $cardOpacity = '0.75'; 
-                    $grayscale = 'grayscale(100%)'; 
-                    $btnClass = 'btn-secondary';
-                    $btnText = 'No Disponible';
+                    $cardOpacity = '0.6'; 
+                    $grayscale = 'grayscale(100%) opacity(0.7)'; 
+                    $btnClass = 'btn-dark';
+                    $btnText = 'Activo Agotado';
                     $btnDisabled = 'disabled style="cursor: not-allowed;"';
                 }
             ?>
 
             <div class="col-sm-6 col-md-4 col-xl-3 fade-in-up tool-item" data-search="<?= strtolower($tool->name . ' ' . $tool->category) ?>">
-                <div class="glass-card h-100 p-0 overflow-hidden tool-card shadow-sm hover-elevate d-flex flex-column" style="opacity: <?= $cardOpacity ?>;">
+                <div class="tool-card h-100 d-flex flex-column" style="opacity: <?= $cardOpacity ?>;">
                     
-                    <div class="position-relative bg-white text-center p-4 d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <img src="<?= base_url ?>assets/img/<?= $tool->image ?>" alt="<?= $tool->name ?>" class="img-fluid" style="max-height: 160px; object-fit: contain; filter: <?= $grayscale ?>;">
+                    <div class="tool-image-container text-center p-4 d-flex align-items-center justify-content-center" style="height: 180px;">
+                        <img src="<?= base_url ?>assets/img/<?= $tool->image ?>" alt="<?= htmlspecialchars($tool->name, ENT_QUOTES) ?>" class="img-fluid" style="max-height: 140px; object-fit: contain; filter: <?= $grayscale ?>;">
                         
-                        <span class="badge <?= $badgeClass ?> position-absolute top-0 end-0 m-3 rounded-pill shadow-sm">
+                        <span class="badge <?= $badgeClass ?> position-absolute top-0 end-0 m-2 rounded shadow-sm px-2 py-1" style="<?= $badgeStyle ?> font-family: monospace; font-size: 0.75rem;">
                             <?= $badgeText ?>
                         </span>
 
-                        <span class="badge bg-light text-dark border position-absolute bottom-0 start-0 m-3 rounded-pill shadow-sm">
-                            <b><?= $stock ?></b> uds.
+                        <span class="badge border border-dark text-dark position-absolute bottom-0 start-0 m-2 px-2 py-1 shadow-sm" style="background-color: rgba(255,255,255,0.9); font-family: monospace;">
+                            STOCK: <b><?= $stock ?></b>
                         </span>
                     </div>
 
-                    <div class="p-4 d-flex flex-column flex-grow-1">
-                        <div class="text-uppercase text-muted x-small fw-bold mb-1">
-                            <?= str_replace('_', ' ', $tool->category) ?>
+                    <div class="p-3 d-flex flex-column flex-grow-1 bg-white">
+                        <div class="text-uppercase fw-bold mb-1" style="font-size: 0.7rem; color: var(--steel-gray); letter-spacing: 1px;">
+                            <i class="fa-solid fa-tag me-1"></i> <?= str_replace('_', ' ', htmlspecialchars($tool->category, ENT_QUOTES)) ?>
                         </div>
                         
-                        <h5 class="fw-bold text-dark mb-2"><?= $tool->name ?></h5>
+                        <h6 class="fw-bold text-dark mb-3 lh-sm" style="font-size: 1.1rem;"><?= htmlspecialchars($tool->name, ENT_QUOTES) ?></h6>
                         
-                        <div class="mt-auto d-grid pt-3">
-                            <button class="btn <?= $btnClass ?> btn-sm shadow-sm fw-bold" 
+                        <div class="mt-auto d-grid">
+                            <button class="btn <?= $btnClass ?> btn-sm shadow-sm fw-bold text-uppercase" style="letter-spacing: 0.5px; border-radius: 4px;"
                                     <?= $btnDisabled ?>
-                                    onclick="addToCart(<?= $tool->id ?>, '<?= addslashes($tool->name) ?>', <?= $stock ?>, '<?= $tool->image ?>')">
-                                <i class="fa-solid fa-cart-plus me-2"></i> <?= $btnText ?>
+                                    onclick="addToCart(<?= $tool->id ?>, '<?= addslashes(htmlspecialchars($tool->name, ENT_QUOTES)) ?>', <?= $stock ?>, '<?= $tool->image ?>')">
+                                <i class="fa-solid fa-truck-ramp-box me-2"></i> <?= $btnText ?>
                             </button>
                         </div>
                     </div>
@@ -98,26 +139,27 @@ $today = date('Y-m-d');
         <?php endwhile; ?>
     <?php else: ?>
         <div class="col-12 text-center py-5">
-            <div class="glass-card p-5 d-inline-block">
-                <i class="fa-solid fa-server text-muted fa-3x mb-3"></i>
-                <h4 class="text-muted">No existen registros de activos en la base de datos.</h4>
+            <div class="bg-white p-5 d-inline-block rounded-4 border shadow-sm">
+                <i class="fa-solid fa-boxes-stacked fa-3x mb-3" style="color: var(--steel-gray);"></i>
+                <h4 class="fw-bold" style="color: var(--panel-darker);">Catálogo Vacío</h4>
+                <p class="text-muted">No existen registros de activos operativos en la base de datos en este momento.</p>
             </div>
         </div>
     <?php endif; ?>
 </div>
 
-<button class="btn btn-primary shadow-lg position-fixed d-flex align-items-center justify-content-center" 
-        style="bottom: 30px; right: 30px; width: 65px; height: 65px; border-radius: 50%; z-index: 1000;"
+<button class="btn btn-cart-float shadow-lg position-fixed d-flex align-items-center justify-content-center" 
+        style="bottom: 30px; right: 30px; width: 70px; height: 70px; border-radius: 50%; z-index: 1000;"
         data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
-    <i class="fa-solid fa-file-invoice fs-4"></i>
-    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" id="cartCount" style="font-size: 0.8rem;">
+    <i class="fa-solid fa-clipboard-list fs-3"></i>
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill shadow" id="cartCount" style="font-size: 0.9rem; background-color: var(--safety-orange); border: 2px solid white;">
         0
     </span>
 </button>
 
-<div class="offcanvas offcanvas-end shadow" tabindex="-1" id="cartOffcanvas" style="width: 450px;">
-    <div class="offcanvas-header bg-primary text-white border-bottom shadow-sm">
-        <h5 class="offcanvas-title fw-bold"><i class="fa-solid fa-truck-fast me-2"></i> Orden de Despacho</h5>
+<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="cartOffcanvas" style="width: 450px; border-left: 5px solid var(--panel-dark);">
+    <div class="offcanvas-header text-white border-bottom" style="background-color: var(--panel-dark);">
+        <h5 class="offcanvas-title fw-bold text-uppercase" style="letter-spacing: 1px;"><i class="fa-solid fa-truck-fast me-2" style="color: var(--safety-orange);"></i> Orden de Despacho</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
     
@@ -125,10 +167,10 @@ $today = date('Y-m-d');
         
         <ul class="nav nav-tabs bg-white px-3 pt-2 shadow-sm" id="cartTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active fw-bold text-primary" id="items-tab" data-bs-toggle="tab" data-bs-target="#items-pane" type="button" role="tab">1. Artículos</button>
+                <button class="nav-link active fw-bold" id="items-tab" data-bs-toggle="tab" data-bs-target="#items-pane" type="button" role="tab" style="color: var(--panel-darker);">1. Equipos Requeridos</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold text-secondary" id="logistics-tab" data-bs-toggle="tab" data-bs-target="#logistics-pane" type="button" role="tab">2. Logística</button>
+                <button class="nav-link fw-bold text-secondary" id="logistics-tab" data-bs-toggle="tab" data-bs-target="#logistics-pane" type="button" role="tab">2. Datos Logísticos</button>
             </li>
         </ul>
 
@@ -139,55 +181,51 @@ $today = date('Y-m-d');
                     </div>
             </div>
 
-            <div class="tab-pane fade p-4" id="logistics-pane" role="tabpanel">
-                <div class="mb-3">
-                    <label class="form-label fw-bold small text-secondary">FRENTE DE OBRA (DESTINO) <span class="text-danger">*</span></label>
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-white border-primary"><i class="fa-solid fa-location-dot text-primary"></i></span>
-                        <select id="cartProjectInput" class="form-select border-primary" required>
-                            <option value="" disabled selected>Seleccione destino...</option>
-                            <?= $optionsHtml ?>
-                        </select>
-                    </div>
+            <div class="tab-pane fade p-4 bg-white h-100" id="logistics-pane" role="tabpanel">
+                <div class="alert mb-4" style="background-color: rgba(234, 88, 12, 0.1); border-left: 4px solid var(--safety-orange);">
+                    <i class="fa-solid fa-circle-info me-2" style="color: var(--safety-orange);"></i>
+                    <small class="fw-bold text-dark">Todos los traslados están sujetos a validación de bodega.</small>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold small text-secondary">FECHA REQUERIDA (ENTREGA) <span class="text-danger">*</span></label>
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-white border-primary"><i class="fa-solid fa-calendar-check text-primary"></i></span>
-                        <input type="date" id="expectedDate" class="form-control border-primary" min="<?= $today ?>" required>
-                    </div>
+                    <label class="form-label fw-bold text-dark" style="font-size: 0.8rem;">FRENTE DE OBRA DESTINO <span class="text-danger">*</span></label>
+                    <select id="cartProjectInput" class="form-select border-dark fw-bold shadow-sm" required>
+                        <option value="" disabled selected>Seleccione la ubicación de destino...</option>
+                        <?= $optionsHtml ?>
+                    </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold small text-secondary">FECHA ESTIMADA DE DEVOLUCIÓN</label>
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-white"><i class="fa-solid fa-calendar-xmark text-secondary"></i></span>
-                        <input type="date" id="returnDate" class="form-control" min="<?= $today ?>">
-                    </div>
-                    <small class="text-muted" style="font-size: 0.70rem;">Opcional. Ayuda a planificar el stock futuro.</small>
+                    <label class="form-label fw-bold text-dark" style="font-size: 0.8rem;">FECHA DE ENTREGA EXIGIDA <span class="text-danger">*</span></label>
+                    <input type="date" id="expectedDate" class="form-control border-dark fw-bold shadow-sm" min="<?= $today ?>" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold small text-secondary">OBSERVACIONES / NOTAS DE DESPACHO</label>
-                    <textarea id="orderNotes" class="form-control shadow-sm" rows="3" placeholder="Ej: Favor incluir extensiones eléctricas, enviar con conductor Juan..."></textarea>
+                    <label class="form-label fw-bold text-secondary" style="font-size: 0.8rem;">FECHA ESTIMADA DE RETORNO (OPCIONAL)</label>
+                    <input type="date" id="returnDate" class="form-control border-secondary shadow-sm" min="<?= $today ?>">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-dark" style="font-size: 0.8rem;">INSTRUCCIONES DE TRANSPORTE</label>
+                    <textarea id="orderNotes" class="form-control border-secondary shadow-sm" rows="3" placeholder="Ej: Enviar equipo con el conductor del camión de las 2:00 PM."></textarea>
                 </div>
             </div>
         </div>
 
         <div class="bg-white p-3 border-top shadow-lg z-1">
-            <button class="btn btn-primary w-100 fw-bold py-2 shadow-sm rounded-pill mb-2" onclick="submitCart()" id="btnSubmitCart">
-                <i class="fa-solid fa-file-signature me-2"></i> Confirmar y Enviar Orden
+            <button class="btn btn-primary w-100 fw-bold py-3 shadow-sm rounded mb-2 text-uppercase" onclick="submitCart()" id="btnSubmitCart" style="letter-spacing: 1px;">
+                <i class="fa-solid fa-file-signature me-2"></i> Emitir Orden Oficial
             </button>
-            <button class="btn btn-outline-danger w-100 btn-sm rounded-pill fw-bold" onclick="clearCart()">
-                <i class="fa-solid fa-trash me-1"></i> Vaciar Orden
+            <button class="btn w-100 btn-sm rounded fw-bold" style="background-color: #f1f5f9; color: #ef4444; border: 1px solid #cbd5e1;" onclick="clearCart()">
+                <i class="fa-solid fa-trash me-1"></i> Descartar Formulario
             </button>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// --- LÓGICA DEL CARRITO PROFESIONAL ---
+// --- LÓGICA DEL CARRITO (TOTALMENTE INTACTA, SOLO ESTILOS ACTUALIZADOS) ---
 let cart = JSON.parse(localStorage.getItem('sicot_cart')) || [];
 
 document.addEventListener('DOMContentLoaded', updateCartUI);
@@ -197,13 +235,13 @@ function addToCart(id, name, maxStock, image) {
     if (existingItem) {
         if(existingItem.qty < maxStock) {
             existingItem.qty++;
-            Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Cantidad actualizada', showConfirmButton:false, timer:2000 });
+            Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Unidad sumada al lote', showConfirmButton:false, timer:2000, iconColor: '#ea580c' });
         } else {
-            Swal.fire({ toast:true, position:'top-end', icon:'warning', title:'No hay más stock', showConfirmButton:false, timer:2500 });
+            Swal.fire({ toast:true, position:'top-end', icon:'warning', title:'Límite de stock físico alcanzado', showConfirmButton:false, timer:2500 });
         }
     } else {
         cart.push({ id: id, name: name, maxStock: maxStock, image: image, qty: 1 });
-        Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Añadido a la orden', showConfirmButton:false, timer:2000 });
+        Swal.fire({ toast:true, position:'top-end', icon:'success', title:'Añadido a la orden logística', showConfirmButton:false, timer:2000, iconColor: '#ea580c' });
     }
     saveCart();
 }
@@ -248,9 +286,9 @@ function updateCartUI() {
     if(cart.length === 0) {
         container.innerHTML = `
             <div class="text-center text-muted mt-5 py-5">
-                <i class="fa-solid fa-box-open fa-3x mb-3 opacity-25"></i>
-                <h6>La orden está vacía</h6>
-                <p class="small">Añade equipos desde el catálogo.</p>
+                <i class="fa-solid fa-clipboard-list fa-3x mb-3 opacity-25"></i>
+                <h6 class="fw-bold text-uppercase">Orden Vacía</h6>
+                <p class="small">Seleccione equipos del catálogo principal.</p>
             </div>`;
         document.getElementById('btnSubmitCart').disabled = true;
         return;
@@ -260,18 +298,18 @@ function updateCartUI() {
 
     cart.forEach(item => {
         container.innerHTML += `
-            <div class="card border-0 shadow-sm mb-3 rounded-3 border-start border-primary border-4">
+            <div class="card border-0 shadow-sm mb-2 rounded bg-white" style="border-left: 4px solid var(--safety-orange) !important;">
                 <div class="card-body p-2 d-flex align-items-center">
-                    <img src="<?= base_url ?>assets/img/${item.image}" alt="" style="width: 50px; height: 50px; object-fit: contain;" class="bg-light rounded p-1 me-3">
+                    <img src="<?= base_url ?>assets/img/${item.image}" alt="" style="width: 50px; height: 50px; object-fit: contain;" class="bg-light rounded p-1 me-3 border">
                     <div class="flex-grow-1">
                         <div class="fw-bold text-dark mb-2" style="font-size: 0.85rem; line-height:1.2;">${item.name}</div>
                         <div class="d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center border rounded bg-light px-2 py-1">
-                                <button class="btn btn-sm btn-link text-danger p-0" onclick="updateItemQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
-                                <span class="mx-3 fw-bold small">${item.qty}</span>
-                                <button class="btn btn-sm btn-link text-success p-0" onclick="updateItemQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
+                            <div class="d-flex align-items-center border rounded bg-light px-2 py-1 border-secondary">
+                                <button class="btn btn-sm btn-link text-dark p-0 text-decoration-none" onclick="updateItemQty(${item.id}, -1)"><i class="fa-solid fa-minus"></i></button>
+                                <span class="mx-3 fw-bold small font-monospace">${item.qty}</span>
+                                <button class="btn btn-sm btn-link p-0 text-decoration-none" style="color: var(--safety-orange);" onclick="updateItemQty(${item.id}, 1)"><i class="fa-solid fa-plus"></i></button>
                             </div>
-                            <button class="btn btn-sm btn-outline-danger border-0" onclick="removeItem(${item.id})"><i class="fa-regular fa-trash-can"></i></button>
+                            <button class="btn btn-sm text-danger border-0 fw-bold" onclick="removeItem(${item.id})"><i class="fa-regular fa-trash-can"></i></button>
                         </div>
                     </div>
                 </div>
@@ -288,27 +326,26 @@ function submitCart() {
     const returnDate = document.getElementById('returnDate').value;
     const orderNotes = document.getElementById('orderNotes').value;
     
-    // Validaciones Logísticas
     if(!projectId) {
-        Swal.fire('Atención', 'Debes seleccionar la obra destino en la pestaña Logística.', 'warning');
+        Swal.fire('Requisito Logístico', 'Debe especificar el frente de obra destino en la pestaña Logística.', 'warning');
         const triggerEl = document.querySelector('#logistics-tab');
         bootstrap.Tab.getOrCreateInstance(triggerEl).show();
         return;
     }
     if(!expectedDate) {
-        Swal.fire('Atención', 'Debes indicar la fecha en que necesitas los equipos.', 'warning');
+        Swal.fire('Requisito Logístico', 'Debe indicar la fecha exacta en la que exige los equipos.', 'warning');
         const triggerEl = document.querySelector('#logistics-tab');
         bootstrap.Tab.getOrCreateInstance(triggerEl).show();
         return;
     }
     if(returnDate && returnDate < expectedDate) {
-        Swal.fire('Error en Fechas', 'La fecha de devolución no puede ser anterior a la fecha de entrega.', 'error');
+        Swal.fire('Error Temporal', 'La fecha estimada de retorno no puede ser anterior a la entrega.', 'error');
         return;
     }
 
     Swal.fire({
-        title: 'Procesando Orden',
-        text: 'Enviando formulario de despacho al Administrador...',
+        title: 'Transmitiendo Orden',
+        text: 'Enviando requerimiento a la central logística...',
         allowOutsideClick: false,
         didOpen: () => { Swal.showLoading(); }
     });
@@ -331,18 +368,17 @@ function submitCart() {
         if(data.status === 'success') {
             clearCart();
             Swal.fire({
-                title: 'Orden Generada', 
+                title: 'Orden Procesada', 
                 text: data.msg, 
                 icon: 'success',
-                confirmButtonColor: '#004b87'
+                confirmButtonColor: '#1e293b'
             }).then(() => location.reload());
-        } else { Swal.fire('Error Operativo', data.msg, 'error'); }
+        } else { Swal.fire('Bloqueo Operativo', data.msg, 'error'); }
     }).catch(error => {
-        Swal.fire('Fallo de Red', 'No se pudo enviar la orden logística.', 'error');
+        Swal.fire('Fallo de Comunicación', 'No se pudo contactar con el servidor central.', 'error');
     });
 }
 
-// Filtro de búsqueda visual
 function filterCatalog() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();

@@ -29,7 +29,7 @@ class AdminController {
     }
 
     public function dashboard(){
-        if($_SESSION['role'] != 'ADMIN'){ header("Location: " . base_url . "User/panel"); exit(); }
+        if($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'BODEGA'){ header("Location: " . base_url . "User/panel"); exit(); }
         
         $toolModel = new ToolModel(); 
         $projectModel = new ProjectModel(); 
@@ -65,12 +65,14 @@ class AdminController {
     }
 
     public function map(){
+        if($_SESSION['role'] != 'ADMIN'){ header("Location: " . base_url . "Admin/dashboard"); exit(); }
         $project = new ProjectModel(); 
         $obras = $project->getAll(); 
         require_once 'views/admin/map.php';
     }
 
     public function users(){
+        if($_SESSION['role'] != 'ADMIN'){ header("Location: " . base_url . "Admin/dashboard"); exit(); }
         $userModel = new UserModel(); 
         $listaUsuarios = $userModel->getAll(); 
         require_once 'views/admin/users.php';
@@ -83,10 +85,10 @@ class AdminController {
     }
 
     // ==========================================================
-    // NUEVA FUNCIÓN: MESA DE AYUDA (INTERFAZ TIPO WHATSAPP)
+    // MESA DE INCIDENCIAS (TICKETS DE SOPORTE CORPORATIVO)
     // ==========================================================
     public function helpDesk(){
-        if($_SESSION['role'] != 'ADMIN'){ header("Location: " . base_url . "User/panel"); exit(); }
+        if($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'BODEGA'){ header("Location: " . base_url . "User/panel"); exit(); }
         
         $requestModel = new RequestModel(); 
         $todosLosReportes = $requestModel->getAll(); 
@@ -106,7 +108,7 @@ class AdminController {
     }
 
     public function workshop(){
-        if($_SESSION['role'] != 'ADMIN'){ header("Location: " . base_url . "User/panel"); exit(); }
+        if($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'BODEGA'){ header("Location: " . base_url . "User/panel"); exit(); }
         
         $maintModel = new MaintenanceModel();
         $activeMaintenance = $maintModel->getActive();
@@ -155,7 +157,7 @@ class AdminController {
     }
 
     public function qrCatalog(){
-        if($_SESSION['role'] != 'ADMIN'){ header("Location: " . base_url . "User/panel"); exit(); }
+        if($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'BODEGA'){ header("Location: " . base_url . "User/panel"); exit(); }
         $toolModel = new ToolModel(); 
         $herramientas = $toolModel->getAll(); 
         require_once 'views/admin/qr_catalog.php';
@@ -169,7 +171,7 @@ class AdminController {
         $requestModel = new RequestModel();
         $data = [];
         try {
-            if($_SESSION['role'] == 'ADMIN'){
+            if($_SESSION['role'] == 'ADMIN' || $_SESSION['role'] == 'BODEGA'){
                 $pendientes = $requestModel->getAll(); 
                 if($pendientes){
                     while($row = $pendientes->fetch_object()){
@@ -285,7 +287,7 @@ class AdminController {
     }
     
     // ==========================================================
-    // LÓGICA DEL CHAT DE SOPORTE AVANZADO (ESTILO WHATSAPP)
+    // LÓGICA DEL CHAT DE SOPORTE AVANZADO (BITÁCORA)
     // ==========================================================
     public function loadChat() {
         error_reporting(0);
@@ -323,7 +325,7 @@ class AdminController {
             echo json_encode([
                 'status' => 'success', 
                 'data' => $data,
-                'user_status' => $userStatus // Retornamos si está En línea
+                'user_status' => $userStatus 
             ]);
         } else {
             echo json_encode(['status' => 'error', 'msg' => 'ID de reporte no provisto.']);
@@ -342,34 +344,59 @@ class AdminController {
             $senderId = $_SESSION['identity']->id;
             
             $reqModel = new RequestModel();
-            $audit = new AuditModel();
 
+            // Se quitó el envío de correo desde aquí. 
+            // Ahora el sistema solo guarda el mensaje para la consola, sin spam al correo.
             $saved = $reqModel->saveChatMessage($reqId, $senderId, $msg);
             
             if($saved) {
-                $audit->logAction($senderId, 'MESA DE AYUDA', 'MENSAJE_ENVIADO', "Respondió en el ticket de soporte #$reqId.");
-
-                $incident = $reqModel->getOne($reqId);
-                
-                if($incident->status == 'PENDIENTE') {
-                    $reqModel->updateStatus($reqId, 'RESUELTO'); 
-                }
-
-                if($incident && !empty($incident->email)) {
-                    require_once 'config/MailService.php';
-                    $mailer = new MailService();
-                    $mailer->sendIncidentReply($incident->email, $incident->fullname, $incident->description, $msg);
-                }
-
-                echo json_encode(['status' => 'success', 'msg' => 'Mensaje enviado.']);
+                echo json_encode(['status' => 'success', 'msg' => 'Mensaje insertado en la bitácora.']);
             } else {
-                echo json_encode(['status' => 'error', 'msg' => 'Error al guardar el mensaje.']);
+                echo json_encode(['status' => 'error', 'msg' => 'Error al guardar el log.']);
             }
         }
         exit();
     }
 
-    // Vaciar el historial del chat solo para el administrador
+    // NUEVO MÉTODO: Cierra el ticket y SÍ envía el correo de resolución final.
+    public function closeTicketMail() {
+        error_reporting(0);
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
+
+        if(isset($_GET['id'])) {
+            $reqId = (int)$_GET['id'];
+            $adminId = $_SESSION['identity']->id;
+            
+            $reqModel = new RequestModel();
+            $auditModel = new AuditModel();
+
+            // Actualizamos estado a resuelto
+            $reqModel->updateStatus($reqId, 'RESUELTO'); 
+            
+            $incident = $reqModel->getOne($reqId);
+            
+            // Registramos en Caja Negra
+            $auditModel->logAction($adminId, 'SOPORTE', 'CIERRE_TICKET', "Selló y resolvió el ticket de incidencia #$reqId.");
+
+            // Enviamos el correo final de resolución
+            if($incident && !empty($incident->email)) {
+                if(file_exists('config/MailService.php')){
+                    require_once 'config/MailService.php';
+                    $mailer = new MailService();
+                    // En el correo, la "respuesta final" será un mensaje genérico de cierre
+                    $finalMessage = "Su reporte ha sido procesado y solucionado por el equipo técnico. Si la falla persiste, por favor aperture un nuevo ticket.";
+                    $mailer->sendIncidentReply($incident->email, $incident->fullname, $incident->description, $finalMessage);
+                }
+            }
+            echo json_encode(['status' => 'success', 'msg' => 'Ticket cerrado y correo enviado.']);
+        } else {
+            echo json_encode(['status' => 'error', 'msg' => 'ID no proporcionado.']);
+        }
+        exit();
+    }
+
+    // Vaciar el historial del chat solo para el administrador (Y registra en Caja Negra)
     public function clearChat() {
         error_reporting(0);
         while (ob_get_level()) ob_end_clean();
@@ -377,12 +404,17 @@ class AdminController {
 
         if(isset($_POST['request_id'])) {
             $reqId = (int)$_POST['request_id'];
+            $adminId = $_SESSION['identity']->id;
+
             $reqModel = new RequestModel();
+            $auditModel = new AuditModel();
             
             if($reqModel->clearChat($reqId, 'ADMIN')) {
-                echo json_encode(['status' => 'success', 'msg' => 'Se ha vaciado el chat en tu dispositivo.']);
+                // Se guarda en la caja negra que un administrador purgo datos
+                $auditModel->logAction($adminId, 'SOPORTE', 'PURGA_CHAT', "Purgó la bitácora local del ticket de soporte #$reqId.");
+                echo json_encode(['status' => 'success', 'msg' => 'Se ha vaciado el chat en tu terminal.']);
             } else {
-                echo json_encode(['status' => 'error', 'msg' => 'Fallo al intentar vaciar el chat.']);
+                echo json_encode(['status' => 'error', 'msg' => 'Fallo al intentar vaciar el historial.']);
             }
         }
         exit();
@@ -525,27 +557,24 @@ class AdminController {
         header("Location: " . base_url . "Admin/users");
     }
 
-    // ====================================================================
-    // ELIMINACIÓN DE USUARIO CON MANEJO DE EXCEPCIONES (TRY-CATCH)
-    // ====================================================================
     public function deleteUser(){
         $id = $_GET['id'] ?? null; 
         if($id){ 
             try {
                 $u = new UserModel(); 
-                // Intentamos borrar al usuario
-                $u->delete($id); 
+                $resultado = $u->delete($id); 
                 
-                // Si funciona, registramos en la caja negra
-                $auditModel = new AuditModel();
-                $auditModel->logAction($_SESSION['identity']->id, 'PERSONAL', 'ELIMINACION_USUARIO', "Eliminó del sistema al usuario con ID: $id.");
-                
-                $_SESSION['alert_message'] = "Usuario eliminado exitosamente del sistema.";
-                $_SESSION['alert_icon'] = "success";
-
-            } catch (mysqli_sql_exception $e) {
-                // ATRAMAPOS EL ERROR: Si tiene historial, la base de datos lanza la excepción y caemos aquí
-                $_SESSION['alert_message'] = "No se puede eliminar este usuario porque tiene herramientas asignadas o historial de reportes. Pida que devuelva los activos primero.";
+                if($resultado) {
+                    $auditModel = new AuditModel();
+                    $auditModel->logAction($_SESSION['identity']->id, 'PERSONAL', 'ELIMINACION_USUARIO', "Eliminó del sistema al usuario con ID: $id.");
+                    $_SESSION['alert_message'] = "El registro del funcionario ha sido eliminado exitosamente.";
+                    $_SESSION['alert_icon'] = "success";
+                } else {
+                    $_SESSION['alert_message'] = "Acción Denegada: El usuario no puede ser eliminado porque tiene herramientas a su cargo o cuenta con historial de transacciones. Asegúrese de procesar primero el retorno de sus activos.";
+                    $_SESSION['alert_icon'] = "error";
+                }
+            } catch (Exception $e) {
+                $_SESSION['alert_message'] = "Acción Denegada: El usuario no puede ser eliminado porque tiene herramientas a su cargo o cuenta con historial de transacciones. Asegúrese de procesar primero el retorno de sus activos.";
                 $_SESSION['alert_icon'] = "error";
             }
         } 

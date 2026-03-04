@@ -22,8 +22,8 @@ class MailService {
             // =========================================================
             // ⚠️ AQUÍ DEBES PONER TU CORREO Y TU CONTRASEÑA DE APLICACIÓN
             // =========================================================
-            $this->mail->Username   = 'xxxxx@gmail.com'; // Tu correo real
-            $this->mail->Password   = 'abcd efgh ijkl mnop'; // Tu Contraseña de Aplicación de Google (NO tu clave normal)
+            $this->mail->Username   = 'sicoterp@gmail.com'; // Tu correo real
+            $this->mail->Password   = 'tcbp rbii zvff rtao'; // Tu Contraseña de Aplicación de Google (NO tu clave normal)
             // =========================================================
             
             $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
@@ -196,5 +196,4 @@ class MailService {
         }
     }
 }
-
 ?>

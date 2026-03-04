@@ -3,25 +3,26 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <style>
-    /* Estilos Estructurales - Perfil Corporativo */
+    /* Estilos Estructurales - Perfil Industrial */
     .dashboard-header {
-        background-color: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
+        background-color: var(--white);
+        border-bottom: 2px solid var(--border-color);
         padding-bottom: 1.5rem;
         margin-bottom: 2rem;
     }
 
     .stat-card {
-        background: linear-gradient(135deg, #004b87 0%, #002c53 100%);
-        color: #ffffff;
+        background-color: var(--panel-dark); /* Azul Pizarra Oscuro */
+        color: var(--white);
         border-radius: 12px;
         min-height: 140px;
-        box-shadow: 0 4px 15px rgba(0, 75, 135, 0.2);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid var(--safety-orange); /* Toque industrial */
     }
 
     .stat-icon-wrapper {
-        background-color: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(5px);
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         width: 60px;
         height: 60px;
         border-radius: 12px;
@@ -32,22 +33,24 @@
     }
 
     .action-card {
-        background-color: #ffffff;
-        border: 1px solid #e2e8f0;
+        background-color: var(--white);
+        border: 1px solid var(--border-color);
         border-radius: 12px;
         cursor: pointer;
         transition: all 0.3s ease;
+        border-bottom: 4px solid var(--panel-dark);
     }
 
     .action-card:hover {
-        border-color: #004b87;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        border-color: var(--safety-orange);
+        border-bottom: 4px solid var(--safety-orange);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         transform: translateY(-3px);
     }
 
     .action-icon-wrapper {
-        background-color: #f1f5f9;
-        color: #004b87;
+        background-color: rgba(234, 88, 12, 0.1);
+        color: var(--safety-orange);
         width: 60px;
         height: 60px;
         border-radius: 12px;
@@ -56,18 +59,22 @@
         justify-content: center;
     }
 
-    /* Tabla de Historial */
+    /* Tabla de Historial Industrial */
+    .history-table { border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
     .history-table th {
-        background-color: #f8fafc;
-        color: #64748b;
-        font-size: 0.8rem;
+        background-color: var(--panel-darker) !important;
+        color: var(--white) !important;
+        font-size: 0.85rem;
+        font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: none;
     }
     .history-table td {
         vertical-align: middle;
-        padding: 1rem 0.5rem;
+        padding: 1.2rem 0.8rem;
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--white);
     }
 
     /* Fix para Mapas en Modales */
@@ -79,17 +86,17 @@
     
     <div class="dashboard-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
-            <h3 class="fw-bold text-dark mb-1">Bienvenido, <?= $_SESSION['identity']->fullname ?></h3>
-            <p class="text-muted mb-0">Panel Operativo de Control en Terreno</p>
+            <h3 class="fw-bold text-dark mb-1">Bienvenido, <?= htmlspecialchars($_SESSION['identity']->fullname, ENT_QUOTES) ?></h3>
+            <p class="text-muted fw-bold mb-0 text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">Panel Operativo de Control en Terreno</p>
         </div>
         <div class="d-flex align-items-center">
-            <span class="badge bg-light text-secondary border border-secondary px-3 py-2 rounded-pill shadow-sm">
-                <i class="fa-solid fa-user-helmet me-2"></i> Técnico / Residente
+            <span class="badge px-3 py-2 rounded-pill shadow-sm" style="background-color: var(--panel-darker); font-size: 0.9rem;">
+                <i class="fa-solid fa-user-helmet me-2" style="color: var(--safety-orange);"></i> Técnico / Residente
             </span>
         </div>
     </div>
 
-    <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-layer-group me-2 text-primary"></i>Resumen de Asignaciones</h5>
+    <h5 class="fw-bold mb-4" style="color: var(--panel-darker);"><i class="fa-solid fa-layer-group me-2" style="color: var(--safety-orange);"></i>Resumen de Asignaciones</h5>
 
     <div class="row mb-5 g-4">
         <div class="col-md-7">
@@ -97,11 +104,11 @@
                 <div class="card-body p-4 d-flex align-items-center justify-content-between h-100">
                     <div class="d-flex align-items-center">
                         <div class="stat-icon-wrapper">
-                            <i class="fa-solid fa-map-location-dot fa-2x text-white"></i>
+                            <i class="fa-solid fa-map-location-dot fa-2x" style="color: var(--safety-orange);"></i>
                         </div>
                         <div>
                             <h5 class="fw-bold mb-1 text-white">Frentes de Obra Asignados</h5>
-                            <p class="text-white-50 small mb-0">Proyectos bajo su supervisión directa</p>
+                            <p class="text-white-50 small mb-0 fw-bold">Proyectos bajo su supervisión directa</p>
                         </div>
                     </div>
                     <div class="text-end">
@@ -115,9 +122,9 @@
             <div class="action-card h-100 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNewProject">
                 <div class="card-body d-flex align-items-center justify-content-between p-4 h-100">
                     <div>
-                        <h6 class="fw-bold text-dark mb-2 text-uppercase" style="letter-spacing: 0.5px;">Apertura de Proyecto</h6>
-                        <p class="text-muted small mb-3">Registrar y georeferenciar nueva zona de trabajo.</p>
-                        <span class="btn btn-sm btn-outline-primary fw-bold px-3">
+                        <h6 class="fw-bold mb-2 text-uppercase" style="color: var(--panel-darker); letter-spacing: 0.5px;">Apertura de Proyecto</h6>
+                        <p class="text-muted fw-bold small mb-3">Registrar y georeferenciar nueva zona de trabajo.</p>
+                        <span class="btn btn-sm btn-primary fw-bold px-3 shadow-sm rounded-pill">
                             <i class="fa-solid fa-plus me-1"></i> Iniciar Registro
                         </span>
                     </div>
@@ -129,21 +136,21 @@
         </div>
     </div>
 
-    <div class="glass-card p-0 border-0 shadow-sm overflow-hidden">
-        <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold text-dark m-0"><i class="fa-solid fa-clock-rotate-left me-2 text-secondary"></i>Registro Histórico de Solicitudes</h6>
-            <button id="btnDeleteSelected" class="btn btn-danger btn-sm px-3 shadow-sm fw-bold" style="display: none;" onclick="deleteSelected()">
+    <div class="card p-0 border-0 shadow-sm overflow-hidden" style="border-radius: 12px;">
+        <div class="card-header border-bottom p-4 d-flex justify-content-between align-items-center" style="background-color: var(--white);">
+            <h6 class="fw-bold m-0 text-uppercase" style="color: var(--panel-darker); letter-spacing: 1px;"><i class="fa-solid fa-clock-rotate-left me-2" style="color: var(--safety-orange);"></i>Registro Histórico de Solicitudes</h6>
+            <button id="btnDeleteSelected" class="btn btn-danger btn-sm px-3 shadow-sm fw-bold rounded-pill" style="display: none;" onclick="deleteSelected()">
                 <i class="fa-solid fa-trash-can me-2"></i> Purgar Historial (<span id="countSelected">0</span>)
             </button>
         </div>
         
-        <div class="card-body p-0">
+        <div class="card-body p-0 bg-white">
             <div class="table-responsive">
                 <table class="table history-table mb-0">
                     <thead>
                         <tr>
                             <th class="ps-4" style="width: 40px;">
-                                <input type="checkbox" id="selectAll" class="form-check-input border-secondary" style="cursor: pointer;">
+                                <input type="checkbox" id="selectAll" class="form-check-input" style="cursor: pointer;">
                             </th>
                             <th>Especificación Técnica / Detalle</th>
                             <th>Fecha de Emisión</th>
@@ -159,34 +166,34 @@
                                 </td>
                                 <td>
                                     <?php if($req->type == 'SOLICITUD_HERRAMIENTA'): ?>
-                                        <span class="badge border border-info text-info bg-light me-2"><i class="fa-solid fa-box-open me-1"></i> Despacho</span>
+                                        <span class="badge border bg-light me-2 text-dark" style="border-color: var(--panel-dark) !important;"><i class="fa-solid fa-box-open me-1" style="color: var(--safety-orange);"></i> Despacho</span>
                                     <?php else: ?>
                                         <span class="badge border border-danger text-danger bg-light me-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Reporte</span>
                                     <?php endif; ?>
-                                    <span class="fw-semibold text-dark"><?= $req->description ?></span>
+                                    <span class="fw-bold text-dark"><?= htmlspecialchars($req->description, ENT_QUOTES) ?></span>
                                     <?php if(!empty($req->tool_name)): ?>
-                                        <br><small class="text-muted ms-5"><i class="fa-solid fa-toolbox me-1"></i> <?= $req->tool_name ?></small>
+                                        <br><small class="text-muted ms-5 fw-bold"><i class="fa-solid fa-toolbox me-1"></i> <?= htmlspecialchars($req->tool_name, ENT_QUOTES) ?></small>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-secondary small fw-bold">
-                                    <i class="fa-regular fa-calendar me-1"></i> <?= date('d/m/Y', strtotime($req->created_at)) ?>
+                                    <i class="fa-regular fa-calendar me-1"></i> <?= date('d / m / Y', strtotime($req->created_at)) ?>
                                 </td>
                                 <td class="text-end pe-4">
                                     <div class="d-flex flex-column align-items-end gap-2">
                                         <?php if($req->status == 'PENDIENTE'): ?>
-                                            <span class="badge bg-warning text-dark shadow-sm px-2 py-1"><i class="fa-solid fa-hourglass-half me-1"></i> En Revisión</span>
+                                            <span class="badge text-dark shadow-sm px-3 py-2" style="background-color: #eab308;"><i class="fa-solid fa-hourglass-half me-1"></i> En Revisión</span>
                                         <?php elseif($req->status == 'APROBADO'): ?>
-                                            <span class="badge bg-success shadow-sm px-2 py-1"><i class="fa-solid fa-check me-1"></i> Autorizado</span>
+                                            <span class="badge bg-success shadow-sm px-3 py-2"><i class="fa-solid fa-check me-1"></i> Autorizado</span>
                                         <?php elseif($req->status == 'RESUELTO'): ?>
-                                            <span class="badge bg-primary shadow-sm px-2 py-1"><i class="fa-solid fa-check-double me-1"></i> Finalizado</span>
+                                            <span class="badge shadow-sm px-3 py-2" style="background-color: var(--panel-dark);"><i class="fa-solid fa-check-double me-1" style="color: var(--safety-orange);"></i> Finalizado</span>
                                         <?php else: ?>
-                                            <span class="badge bg-danger shadow-sm px-2 py-1"><i class="fa-solid fa-xmark me-1"></i> Denegado</span>
+                                            <span class="badge bg-danger shadow-sm px-3 py-2"><i class="fa-solid fa-xmark me-1"></i> Denegado</span>
                                         <?php endif; ?>
 
                                         <?php if(strpos($req->type, 'REPORTE') !== false): ?>
-                                            <button class="btn btn-sm btn-outline-primary fw-bold rounded-pill shadow-sm" 
-                                                    onclick="openUserChat(<?= $req->id ?>, '<?= addslashes($req->description) ?>')">
-                                                <i class="fa-solid fa-comments me-1"></i> Ver Chat
+                                            <button class="btn btn-sm fw-bold rounded-pill shadow-sm" style="background-color: var(--white); border: 2px solid var(--panel-dark); color: var(--panel-dark);" 
+                                                    onclick="openUserChat(<?= $req->id ?>, '<?= addslashes(htmlspecialchars($req->description, ENT_QUOTES)) ?>')">
+                                                <i class="fa-solid fa-headset me-1 text-info"></i> Abrir Ticket
                                             </button>
                                         <?php endif; ?>
                                     </div>
@@ -196,8 +203,8 @@
                         <?php else: ?>
                             <tr>
                                 <td colspan="4" class="text-center py-5 text-muted">
-                                    <i class="fa-solid fa-file-circle-question fa-2x mb-3 text-secondary"></i>
-                                    <p class="fw-bold mb-0">Su registro de transacciones operativas está vacío.</p>
+                                    <i class="fa-solid fa-folder-open fa-3x mb-3" style="color: var(--border-color);"></i>
+                                    <p class="fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">Registro Operativo Vacío.</p>
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -208,33 +215,33 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalNewProject" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalNewProject" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-dark text-white py-3">
-                <h6 class="modal-title fw-bold text-uppercase" style="letter-spacing: 1px;"><i class="fa-solid fa-map-pin me-2 text-primary"></i>Apertura de Proyecto Georeferenciado</h6>
+        <div class="modal-content shadow-lg" style="border: none; border-radius: 12px; overflow: hidden;">
+            <div class="modal-header py-3" style="background-color: var(--panel-dark); color: white;">
+                <h6 class="modal-title fw-bold text-uppercase" style="letter-spacing: 1px;"><i class="fa-solid fa-map-pin me-2" style="color: var(--safety-orange);"></i>Apertura de Proyecto Georeferenciado</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="<?= base_url ?>User/saveProject" method="POST" enctype="multipart/form-data">
-                <div class="modal-body p-4">
+                <div class="modal-body p-4 bg-light">
                     <div class="row g-4">
                         <div class="col-md-5 border-end">
-                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Especificaciones Técnicas</h6>
+                            <h6 class="fw-bold border-bottom pb-2 mb-3 text-uppercase" style="color: var(--panel-darker);">Especificaciones Técnicas</h6>
                             
                             <div class="mb-3">
                                 <label class="fw-bold text-secondary small text-uppercase">Identificación de Obra</label>
-                                <input type="text" name="name" class="form-control fw-bold" required>
+                                <input type="text" name="name" class="form-control fw-bold border-secondary" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="fw-bold text-secondary small text-uppercase">Entidad / Cliente Responsable</label>
-                                <input type="text" name="company_client" class="form-control" required>
+                                <input type="text" name="company_client" class="form-control border-secondary" required>
                             </div>
 
                             <div class="row g-2 mb-3">
                                 <div class="col-6">
                                     <label class="fw-bold text-secondary small text-uppercase">Clasificación</label>
-                                    <select name="type_work" class="form-select">
+                                    <select name="type_work" class="form-select border-secondary fw-bold">
                                         <option value="Residencial">Residencial</option>
                                         <option value="Comercial">Comercial</option>
                                         <option value="Vial">Infraestructura Vial</option>
@@ -243,34 +250,34 @@
                                 </div>
                                 <div class="col-6">
                                     <label class="fw-bold text-secondary small text-uppercase">Fecha de Inicio</label>
-                                    <input type="date" name="start_date" class="form-control" required>
+                                    <input type="date" name="start_date" class="form-control border-secondary fw-bold" required>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="fw-bold text-secondary small text-uppercase">Presupuesto Asignado (Opcional)</label>
-                                <input type="number" name="budget" class="form-control" placeholder="0.00" step="0.01">
+                                <input type="number" name="budget" class="form-control border-secondary fw-bold" placeholder="0.00" step="0.01">
                             </div>
 
                             <div class="mb-0">
                                 <label class="fw-bold text-secondary small text-uppercase">Soporte Gráfico / Plano</label>
-                                <input type="file" name="image" class="form-control" accept="image/*">
+                                <input type="file" name="image" class="form-control border-secondary bg-white" accept="image/*">
                             </div>
                         </div>
                         
                         <div class="col-md-7">
-                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Geolocalización del Terreno</h6>
-                            <div class="input-group mb-3">
-                                <input type="text" id="txtDireccionUser" name="address" class="form-control" placeholder="Buscar dirección o municipio..." required>
-                                <button class="btn btn-dark" type="button" id="btnBuscarUser" onclick="buscarDireccionUser()">
+                            <h6 class="fw-bold border-bottom pb-2 mb-3 text-uppercase" style="color: var(--panel-darker);">Geolocalización del Terreno</h6>
+                            <div class="input-group mb-3 shadow-sm">
+                                <input type="text" id="txtDireccionUser" name="address" class="form-control border-secondary fw-bold" placeholder="Buscar dirección o municipio..." required>
+                                <button class="btn btn-dark fw-bold px-4" type="button" id="btnBuscarUser" onclick="buscarDireccionUser()">
                                     <i class="fa-solid fa-magnifying-glass me-1"></i> Localizar
                                 </button>
                             </div>
                             
-                            <div id="miniMapUser" style="height: 330px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e0;"></div>
+                            <div id="miniMapUser" style="height: 330px; width: 100%; border-radius: 8px; border: 2px solid var(--panel-dark);"></div>
                             
                             <div class="mt-3 text-center">
-                                <span class="badge bg-success d-none p-2 rounded px-3 shadow-sm fw-bold" id="msgExitoUser">
+                                <span class="badge bg-success d-none p-2 rounded px-3 shadow-sm fw-bold" id="msgExitoUser" style="font-size: 0.85rem;">
                                     <i class="fa-solid fa-satellite-dish me-1"></i> Coordenadas fijadas en el servidor
                                 </span>
                             </div>
@@ -280,9 +287,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary fw-bold px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm" id="btnGuardarUser" disabled>
+                <div class="modal-footer bg-white border-top py-3">
+                    <button type="button" class="btn btn-outline-secondary fw-bold rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm rounded-pill" id="btnGuardarUser" disabled>
                         <i class="fa-solid fa-satellite me-2"></i> Transmitir Coordenadas
                     </button>
                 </div>
@@ -291,32 +298,32 @@
     </div>
 </div>
 
-<div class="offcanvas offcanvas-end shadow" tabindex="-1" id="userChatOffcanvas" style="width: 450px;">
-    <div class="offcanvas-header bg-dark text-white border-bottom shadow-sm">
-        <h5 class="offcanvas-title fw-bold"><i class="fa-solid fa-headset me-2 text-info"></i> Soporte Central</h5>
+<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="userChatOffcanvas" style="width: 450px; border-left: 5px solid var(--panel-dark);">
+    <div class="offcanvas-header text-white border-bottom" style="background-color: var(--panel-dark);">
+        <h5 class="offcanvas-title fw-bold text-uppercase" style="letter-spacing: 1px;"><i class="fa-solid fa-headset me-2" style="color: var(--safety-orange);"></i> Soporte Técnico</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
     </div>
-    <div class="offcanvas-body d-flex flex-column p-0 bg-light" style="overflow: hidden;">
+    <div class="offcanvas-body d-flex flex-column p-0" style="background-color: var(--bg-app); overflow: hidden;">
         
         <div class="p-3 bg-white border-bottom shadow-sm z-1">
-            <span class="badge border border-danger text-danger mb-1" style="font-size: 0.65rem;">TU REPORTE ORIGINAL</span>
-            <p id="userChatOriginalDesc" class="mb-0 small text-secondary fw-bold fst-italic" style="line-height: 1.2;"></p>
+            <span class="badge text-white mb-1 px-2 py-1" style="background-color: #ef4444; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px;">REPORTE ORIGINAL DEL TICKET</span>
+            <p id="userChatOriginalDesc" class="mb-0 small text-dark fw-bold" style="line-height: 1.3; font-family: monospace;"></p>
         </div>
         
-        <div id="userChatMessagesBox" class="flex-grow-1 p-3 d-flex flex-column gap-3" style="background: #eef2f5; overflow-y: auto;">
+        <div id="userChatMessagesBox" class="flex-grow-1 p-3 d-flex flex-column gap-3" style="background: var(--bg-app); overflow-y: auto;">
             </div>
         
         <div class="p-3 bg-white border-top shadow-lg">
             <form id="userChatForm">
                 <input type="hidden" id="userChatRequestId">
                 <div class="input-group shadow-sm">
-                    <input type="text" id="userChatInput" class="form-control rounded-start border-primary" placeholder="Escribe un mensaje..." required autocomplete="off">
-                    <button class="btn btn-primary fw-bold px-3 border-primary" type="submit" id="btnSendUserChat">
-                        <i class="fa-solid fa-paper-plane"></i>
+                    <input type="text" id="userChatInput" class="form-control rounded-start fw-bold" style="border: 2px solid var(--panel-dark);" placeholder="Agregar actualización a la bitácora..." required autocomplete="off">
+                    <button class="btn btn-primary fw-bold px-4" type="submit" id="btnSendUserChat">
+                        <i class="fa-solid fa-share"></i>
                     </button>
                 </div>
-                <div class="text-muted small text-center mt-2" style="font-size: 0.70rem;">
-                    <i class="fa-solid fa-check me-1"></i> El administrador será notificado.
+                <div class="text-muted fw-bold text-center mt-2" style="font-size: 0.70rem; text-transform: uppercase;">
+                    <i class="fa-solid fa-lock me-1"></i> Comunicación cifrada con Central
                 </div>
             </form>
         </div>
@@ -326,6 +333,8 @@
 <?php require_once 'views/layouts/footer.php'; ?>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     // --- LÓGICA DE BORRADO DE HISTORIAL ---
     document.addEventListener("DOMContentLoaded", function() {
@@ -368,7 +377,8 @@
             text: "Se procederá a archivar " + ids.length + " registros de su historial local.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#004b87',
+            confirmButtonColor: '#ea580c', // Naranja Seguridad
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Ejecutar Purga',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
@@ -381,7 +391,7 @@
                                 title: 'Operación Exitosa',
                                 text: data.msg,
                                 icon: 'success',
-                                confirmButtonColor: '#004b87'
+                                confirmButtonColor: '#ea580c'
                             }).then(() => location.reload());
                         } else {
                             Swal.fire('Error', data.msg, 'error');
@@ -398,8 +408,8 @@
     document.getElementById('modalNewProject').addEventListener('shown.bs.modal', function () {
         if (!miniMapUser) {
             miniMapUser = L.map('miniMapUser').setView([4.5709, -74.2973], 5);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: 'SICOT ERP | &copy; CARTO'
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri'
             }).addTo(miniMapUser);
             
             miniMapUser.on('click', function(e) { ponerPinUser(e.latlng.lat, e.latlng.lng); });
@@ -444,7 +454,7 @@
         
         var corporateIcon = L.divIcon({ 
             className: 'custom-div-icon', 
-            html: `<div style="width: 32px; height: 32px; background: #004b87; border: 2px solid #ffffff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 8px rgba(0,0,0,0.2); display: flex; justify-content: center; align-items: center;"><i class='fa-solid fa-crosshairs' style='transform: rotate(45deg); color: #ffffff; font-size: 12px;'></i></div>`, 
+            html: `<div style="width: 32px; height: 32px; background: #ea580c; border: 2px solid #ffffff; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center;"><i class='fa-solid fa-crosshairs' style='transform: rotate(45deg); color: #ffffff; font-size: 12px;'></i></div>`, 
             iconSize: [32, 32], 
             iconAnchor: [16, 32], 
             popupAnchor: [0, -32] 
@@ -464,7 +474,7 @@
         });
     }
 
-    // --- LÓGICA DEL CHAT DE SOPORTE PARA USUARIO ---
+    // --- LÓGICA DEL CHAT (MODO TICKET DE SOPORTE) ---
     let currentUserIdChat = null;
     const uOffcanvasEl = document.getElementById('userChatOffcanvas');
     let uChatOffcanvas = null;
@@ -476,7 +486,7 @@
     function openUserChat(id, desc) {
         currentUserIdChat = id;
         document.getElementById('userChatRequestId').value = id;
-        document.getElementById('userChatOriginalDesc').innerText = '"' + desc + '"';
+        document.getElementById('userChatOriginalDesc').innerText = '> ' + desc;
         uChatOffcanvas.show();
         loadUserChatMessages();
     }
@@ -490,26 +500,29 @@
             box.innerHTML = '';
             if(res.data && res.data.length > 0) {
                 res.data.forEach(msg => {
-                    // Verificamos si el mensaje lo envió el usuario actual o el admin
                     const isMe = (msg.sender_id == '<?= $_SESSION["identity"]->id ?>');
-                    const alignClass = isMe ? 'align-self-end text-end' : 'align-self-start text-start';
-                    const bgClass = isMe ? 'bg-primary text-white shadow-sm' : 'bg-white border text-dark shadow-sm';
-                    const radius = isMe ? '15px 15px 0 15px' : '15px 15px 15px 0';
-                    const senderName = isMe ? 'Tú' : 'Soporte Central';
+                    
+                    // Diseño tipo Ticket/Terminal en lugar de burbujitas
+                    const bgColor = isMe ? '#ffffff' : '#e2e8f0';
+                    const borderLeft = isMe ? '4px solid #ea580c' : '4px solid #1e293b';
+                    const senderName = isMe ? '👤 OPERADOR EN CAMPO' : '⚙️ CENTRAL DE SOPORTE';
+                    const align = isMe ? 'ms-auto' : 'me-auto';
 
                     box.innerHTML += `
-                        <div class="${alignClass}" style="max-width: 85%;">
-                            <div class="small text-muted fw-bold mb-1" style="font-size: 0.65rem;">${senderName}</div>
-                            <div class="p-2 px-3" style="${bgClass}; border-radius: ${radius};">
-                                <p class="mb-0 small">${msg.message}</p>
+                        <div class="card border-0 shadow-sm ${align} w-100 mb-2" style="background-color: ${bgColor}; border-left: ${borderLeft} !important; border-radius: 4px;">
+                            <div class="card-body p-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="fw-bold" style="font-size: 0.7rem; color: #475569;">${senderName}</small>
+                                    <small class="text-muted" style="font-size: 0.65rem; font-family: monospace;">${msg.time}</small>
+                                </div>
+                                <p class="mb-0 text-dark fw-bold" style="font-size: 0.85rem; font-family: monospace;">> ${msg.message}</p>
                             </div>
-                            <div class="text-muted mt-1" style="font-size: 0.65rem;"><i class="fa-regular fa-clock me-1"></i>${msg.time}</div>
                         </div>
                     `;
                 });
                 box.scrollTop = box.scrollHeight;
             } else {
-                box.innerHTML = '<div class="text-center text-muted mt-5 py-5"><i class="fa-solid fa-comments fa-3x mb-3 opacity-25"></i><p class="small">Aún no hay mensajes. Escribe para contactar a soporte.</p></div>';
+                box.innerHTML = '<div class="text-center text-muted mt-5 py-5"><i class="fa-solid fa-clipboard-list fa-3x mb-3 opacity-25"></i><p class="small fw-bold text-uppercase">Bitácora de comunicación vacía.</p></div>';
             }
         }, 'json');
     }
@@ -526,12 +539,10 @@
         
         $.post('<?= base_url ?>User/sendChatMessage', {request_id: currentUserIdChat, message: msg}, function(res) {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+            btn.innerHTML = '<i class="fa-solid fa-share"></i>';
             if(res.status === 'success') {
                 msgInput.value = '';
                 loadUserChatMessages();
-                // Opcional: Recargar la página si quieres que el estado cambie visualmente en la tabla
-                // location.reload(); 
             } else {
                 Swal.fire('Error', res.msg, 'error');
             }
