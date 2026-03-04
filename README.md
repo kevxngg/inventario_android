@@ -11,16 +11,8 @@
 
 <p><em>"it's wicked outside"</em></p>
 
-<br>
 
-### ¡Hola! Bienvenido a mi perfil 👋
-**Desarrollador | Entusiasta de la Tecnología**
-
----
-
-### 💻 Stack Tecnológico
-
-Aquí están las tecnologías con las que trabajo principalmente:
+Trabajo hecho en:
 
 ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
@@ -40,9 +32,3 @@ Aquí están las tecnologías con las que trabajo principalmente:
 [![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)](https://www.youtube.com/@KEVXNGG)
 
 <br>
-
-*Estadísticas de mi GitHub:*
-<br>
-<img src="https://github-readme-stats.vercel.app/api?username=KEVXNGG&show_icons=true&theme=radium&hide_border=true" alt="Estadísticas de KEVXNGG" />
-
-</div>
